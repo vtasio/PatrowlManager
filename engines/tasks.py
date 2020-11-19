@@ -847,6 +847,10 @@ def _create_asset_on_import(asset_value, scan, asset_type='unknown', parent=None
     }
     asset = Asset(**asset_args)
     asset.save()
+    # Add Type as Tag
+    new_tag = _add_asset_tags(asset, asset_type)
+    asset.categories.add(new_tag)
+    asset.save()
     scan.assets.add(asset)
 
     # Then add the asset to every related asset groups
