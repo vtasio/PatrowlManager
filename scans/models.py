@@ -210,7 +210,6 @@ class Scan(models.Model):
     finished_at     = models.DateTimeField(null=True, blank=True)
     created_at      = models.DateTimeField(default=timezone.now)
     updated_at      = models.DateTimeField(default=timezone.now)
-    nessscan_id = models.IntegerField(null=True, blank=True)
 
     class Meta:
         db_table = 'scans'

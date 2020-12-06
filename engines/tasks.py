@@ -286,11 +286,7 @@ def stopscan_task(self, scan_id):
     engine = scan.engine
     resp = None
     try:
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            #scan_status = _get_scan_status(engine=engine, scan_id=scan.id, scan_options=scan.options)
-            resp = requests.get(url=str(engine.api_url)+"stop/"+str(scan_id)+"/"+str(scan.nessscan_id), verify=False, proxies=PROXIES)
-        else:
-            resp = requests.get(url=str(engine.api_url)+"stop/"+str(scan_id), verify=False, proxies=PROXIES)
+        resp = requests.get(url=str(engine.api_url)+"stop/"+str(scan_id), verify=False, proxies=PROXIES)
         if resp.status_code != 200 or json.loads(resp.text)['status'] == "error":
             scan.status = "error"
             scan.finished_at = timezone.now()
@@ -400,10 +396,6 @@ def startscan_task(self, params):
             proxies=PROXIES,
             timeout=TIMEOUT)
         scan_options=json.dumps(params['scan_params']['options'])
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            nessscan_id = int(json.loads(resp.text)['nessscan_id'])
-            scan.nessscan_id = nessscan_id
-            scan.save()
 
         # if resp.status_code != 200 or json.loads(resp.text)['status'] != "accepted":
         if resp.status_code != 200 or json.loads(resp.text)['status'] not in ["accepted", "ACCEPTED"]:
@@ -461,11 +453,7 @@ def startscan_task(self, params):
 
     # -4- get the results (findings)
     try:
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            scan_status = _get_scan_status(engine=engine_inst, scan_id=scan.id, scan_options=scan_options)
-            resp = requests.get(url=str(engine_inst.api_url)+"getfindings/"+str(scan.id)+"/"+str(scan.nessscan_id), proxies=PROXIES)
-        else:
-            resp = requests.get(
+        resp = requests.get(
                 url=str(engine_inst.api_url) + "getfindings/" + str(scan.id),
                 proxies=PROXIES)
         if resp.status_code != 200 or json.loads(resp.text)['status'] == "error":
@@ -660,10 +648,6 @@ def start_periodic_scan_task(self, params):
             proxies=PROXIES,
             timeout=TIMEOUT)
         scan_options=json.dumps(params['scan_params']['options'])
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            nessscan_id = int(json.loads(resp.text)['nessscan_id'])
-            scan.nessscan_id = nessscan_id
-            scan.save()
 
         # if resp.status_code != 200 or json.loads(resp.text)['status'] != "accepted":
         if resp.status_code != 200 or json.loads(resp.text)['status'] not in ["accepted", "ACCEPTED"]:
@@ -701,11 +685,7 @@ def start_periodic_scan_task(self, params):
 
     # -4- get the results
     try:
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            scan_status = _get_scan_status(engine=engine_inst, scan_id=scan.id, scan_options=scan_options)
-            resp = requests.get(url=str(engine_inst.api_url)+"getfindings/"+str(scan.id)+"/"+str(scan.nessscan_id), proxies=PROXIES)
-        else:
-            resp = requests.get(url=str(engine_inst.api_url) + "getfindings/" + str(scan.id), proxies=PROXIES)
+        resp = requests.get(url=str(engine_inst.api_url) + "getfindings/" + str(scan.id), proxies=PROXIES)
         if resp.status_code != 200 or json.loads(resp.text)['status'] == "error":
             print("Something goes wrong in 'startscan_task/results' (request_status_code={}, engine_error={})", resp.status_code, json.loads(resp.text)['reason'])
             Event.objects.create(message="Something goes wrong in 'startscan_task/results' (request_status_code={}, engine_error={})".format(resp.status_code, json.loads(resp.text)['reason']), type="ERROR", severity="ERROR", scan=scan)
@@ -783,14 +763,7 @@ def _get_scan_status(engine, scan_id, scan_options):
     scan_status = "undefined"
     scan = Scan.objects.get(id=scan_id)
     try:
-        if scan.engine_type == Engine.objects.filter(name='NESSUS').first():
-            resp = requests.post(url=str(engine.api_url) + "status/" + str(scan_id) + "/"
-                                    + str(scan.nessscan_id),data=scan_options,
-            headers={'Content-type': 'application/json', 'Accept': 'application/json'},
-                                 verify=False, proxies=PROXIES,
-                                timeout=TIMEOUT)
-        else:
-            resp = requests.get(url=str(engine.api_url)+"status/"+str(scan_id), verify=False, proxies=PROXIES, timeout=TIMEOUT)
+        resp = requests.get(url=str(engine.api_url)+"status/"+str(scan_id), verify=False, proxies=PROXIES, timeout=TIMEOUT)
         if resp.status_code == 200:
             scan_status = json.loads(resp.text)['status'].strip().upper()
         else:
