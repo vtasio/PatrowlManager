@@ -22,7 +22,7 @@ import re
 # import logging
 # logger = logging.getLogger(__name__)
 
-HTTP_REQUEST_MAX_TIMEOUT=getattr(settings, 'HTTP_REQUEST_MAX_TIMEOUT', 60)
+ENGINE_HTTP_TIMEOUT=getattr(settings, 'ENGINE_HTTP_TIMEOUT', 600)
 SCAN_JOB_DEFAULT_TIMEOUT=getattr(settings, 'SCAN_JOB_DEFAULT_TIMEOUT', 7200)
 SCAN_JOB_DEFAULT_SPLIT_ASSETS=getattr(settings, 'SCAN_JOB_DEFAULT_SPLIT_ASSETS', 100)
 NB_MAX_RETRIES=5
@@ -32,7 +32,7 @@ def _get_engine_status(engine):
     engine_status = "undefined"
 
     try:
-        resp = requests.get(url=str(engine.api_url)+"status", verify=False, proxies=settings.PROXIES, timeout=HTTP_REQUEST_MAX_TIMEOUT)
+        resp = requests.get(url=str(engine.api_url)+"status", verify=False, proxies=settings.PROXIES, timeout=ENGINE_HTTP_TIMEOUT)
 
         if resp.status_code == 200:
             engine_status = json.loads(resp.text)['status'].strip().upper()
@@ -50,7 +50,7 @@ def _get_scan_status(engine, scan_id):
     scan_status = "undefined"
 
     try:
-        resp = requests.get(url=str(engine.api_url)+"status/"+str(scan_id), verify=False, proxies=settings.PROXIES, timeout=HTTP_REQUEST_MAX_TIMEOUT)
+        resp = requests.get(url=str(engine.api_url)+"status/"+str(scan_id), verify=False, proxies=settings.PROXIES, timeout=ENGINE_HTTP_TIMEOUT)
         if resp.status_code == 200:
             scan_status = json.loads(resp.text)['status'].strip().upper()
         else:
@@ -173,6 +173,7 @@ def _run_scan_job(self, evt_prefix, scan_id, assets_subset, position=1, max_time
         pass
 
     timeout = time.time() + max_timeout
+    Event.objects.create(message="{} BeforeScan - ScanJob timeout: {}.".format(evt_prefix, timeout), type="INFO", severity="INFO", scan=scan)
 
     # Check Scan status
     if scan.status not in ["started", "enqueued"]:
@@ -192,6 +193,7 @@ def _run_scan_job(self, evt_prefix, scan_id, assets_subset, position=1, max_time
         started_at=timezone.now(),
     )
     scan_job.save()
+    Event.objects.create(message="{} DuringScan - ScanJob id: {}.".format(evt_prefix, scan_job.id), type="INFO", severity="INFO", scan=scan)
 
     # Set the assets
     for asset_id in assets_subset:
@@ -273,7 +275,7 @@ def _run_scan_job(self, evt_prefix, scan_id, assets_subset, position=1, max_time
             data=json.dumps(scan_params),
             headers={'Content-type': 'application/json', 'Accept': 'application/json'},
             proxies=settings.PROXIES,
-            timeout=HTTP_REQUEST_MAX_TIMEOUT
+            timeout=ENGINE_HTTP_TIMEOUT
         )
 
         if resp.status_code != 200 or json.loads(resp.text)['status'] not in ["accepted", "ACCEPTED"]:
@@ -287,7 +289,7 @@ def _run_scan_job(self, evt_prefix, scan_id, assets_subset, position=1, max_time
             except Exception:
                 pass
 
-            Event.objects.create(message="{} DuringScan - something goes wrong (response_status_code={}, response_status={}, response_details={}). Task aborted.".format(evt_prefix, resp.status_code, json.loads(resp.text)['status'], response_reason),
+            Event.objects.create(message="{} DuringScan - Something goes wrong (response_status_code={}, response_status={}, response_details={}). Task aborted.".format(evt_prefix, resp.status_code, json.loads(resp.text)['status'], response_reason),
                 description=str(resp.text), type="ERROR", severity="ERROR", scan=scan)
             return False
     except requests.exceptions.RequestException as e:
@@ -514,6 +516,7 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 if f_nessus:
                     tmp_status = "duplicate"
 
+            # Check if it's the first time the finding has been found
             if f is not None:
                 # We already see you
                 f.checked_at = timezone.now()
@@ -522,6 +525,13 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 f.save()
                 new_raw_finding.status = f.status
                 new_raw_finding.save()
+
+                # Evaluate alerting rules
+                # try:
+                #     new_raw_finding.evaluate_alert_rules(trigger='auto')
+                # except Exception as e:
+                #     Event.objects.create(message="{} Error in alerting".format(evt_prefix),
+                #         type="ERROR", severity="ERROR", scan=scan, description=str(e))
 
                 known_findings_list.append(new_raw_finding.hash)
             else:
