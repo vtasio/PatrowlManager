@@ -313,7 +313,7 @@ def _run_scan_job(self, evt_prefix, scan_id, assets_subset, position=1, max_time
         else:
             Event.objects.create(message="{} DuringScan - bad scanner status: {} (retries left={}).".format(evt_prefix, scan_status, retries), type="ERROR", severity="ERROR", scan=scan)
             retries -= 1
-        time.sleep(5)
+        time.sleep(50)
         scan_status = _get_scan_status(engine=engine_inst, scan_id=scan_job.id)
         print("scan status (in loop): {}".format(scan_status))
 
