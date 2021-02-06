@@ -13,7 +13,6 @@ from common.utils.encoding import json_serial
 import os
 import json
 import inspect
-# import uuid
 
 SCAN_STATUS = ('created', 'enqueued', 'started', 'finished', 'error', 'trashed')
 
@@ -37,6 +36,24 @@ SCAN_TYPES = (
 #     ('finished', 'Finished'),
 #     ('error', 'Error'),
 # )
+
+DEFAULT_SCAN_OPTIONS = {
+    'assets': {
+        'enable_auto_add': False
+    },
+    'notification': {
+        'email': {
+            'enable': False,
+            'attach_report': False,
+            'recipients': [],
+            'subject': "[Patrowl] New report available",
+            'condition': {
+                'type': 'always',
+                'criteria': None
+            },
+        }
+    }
+}
 
 SCAN_JOB_STATUS = (
     ('started', 'Started'),

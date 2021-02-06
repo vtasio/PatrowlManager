@@ -16,6 +16,24 @@
 label.radio {
   margin-left: 20px;
 }
+
+.jb {
+  border-radius: 6px;
+  background-color: #ecf0f1;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 5px;
+}
+
 </style>
 
 <ul class="breadcrumb">
@@ -32,7 +50,7 @@ label.radio {
     <!-- Title -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_title">Title</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <input id="id_title" name="title" type="text" placeholder="Enter a title..." required class="form-control"/>
       </div>
     </div>
@@ -40,7 +58,7 @@ label.radio {
     <!-- Description -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_description">Description</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <textarea cols="40" id="id_description" name="description" placeholder="Enter a quick description..." rows="5" class="form-control"></textarea>
       </div>
     </div>
@@ -48,8 +66,8 @@ label.radio {
     <!-- Scan Type -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_scan_type">Scan Type</label>
-      <div class="col-sm-5">
-        <div class="col-sm-5 no_padding">
+      <div class="col-sm-6">
+        <div class="col-sm-4 no_padding">
           <div class="btn-group btn-group-sm btn-scantype" data-toggle="buttons">
             <label class="btn btn-success active" id="lbl_scan_type_ondemand">
               <input type="radio" name="scan_type" value="single" id="id_scan_type_ondemand" autocomplete="off" checked="checked"> On-demand
@@ -60,7 +78,7 @@ label.radio {
           </div>
         </div>
         <!-- Periodicity options -->
-        <div class="col-sm-7">
+        <div class="col-sm-8 no_padding">
           <div class="col-sm-6 no_padding">
             <input class="form-control form-control-sm" type="text" placeholder="freq." id="id_scan_periodic_freq" name="every" disabled>
           </div>
@@ -79,8 +97,8 @@ label.radio {
     <!-- Scan starting -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_enabled">Start scan</label>
-      <div class="col-sm-4">
-        <div class="col-sm-7 no_padding">
+      <div class="col-sm-6">
+        <div class="col-sm-5 no_padding">
           <div class="btn-group btn-group-sm btn-scanrun" data-toggle="buttons">
             <label class="btn btn-success active" id="lbl_start_later">
               <input type="radio" name="start_scan" id="id_start_later" autocomplete="off" checked="checked" value="later">Later
@@ -93,7 +111,7 @@ label.radio {
             </label>
           </div>
         </div>
-        <div class="col-sm-5 controls input-append date no_padding" id="id_scheduled_at_div" >
+        <div class="col-sm-7 controls input-append date no_padding" id="id_scheduled_at_div" >
           <input id="id_scheduled_at" name="scheduled_at" type="text" class="form-control form-control-sm" placeholder="pick a date" disabled/>
         </div>
       </div>
@@ -102,8 +120,8 @@ label.radio {
     <!-- Team selection -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_teams_list">Share with team:</label>
-      <div class="col-sm-5 has-feedback">
-        <div class="col-sm-3 no_padding">
+      <div class="col-sm-6 has-feedback">
+        <div class="col-sm-2 no_padding">
           <div class="btn-group btn-group-sm btn-scanteam" data-toggle="buttons">
             <label class="btn btn-success active" id="lbl_scan_team_no">
               <input type="radio" name="scan_team" value="no" id="id_scan_team_no" autocomplete="off" checked="checked"> No
@@ -113,7 +131,7 @@ label.radio {
             </label>
           </div>
         </div>
-        <div class="col-sm-9 no_padding">
+        <div class="col-sm-10 no_padding">
           <select class="form-control form-control-sm" id="id_scan_team_list" name="scan_team_list" disabled>
             {% for team in teams_list %}
             <option value="{{team.id}}">{{team.name}}</option>
@@ -126,7 +144,7 @@ label.radio {
     <!-- Asset selection -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_assets_list">Search asset(s):</label>
-      <div class="col-sm-5 has-feedback">
+      <div class="col-sm-6 has-feedback">
         <div id="scrollable-dropdown-menu">
           <input class="typeahead form-control" type="text" placeholder="Search assets">
           <i class="form-control-feedback glyphicon glyphicon-search"></i>
@@ -137,7 +155,7 @@ label.radio {
     <!-- Selected assets and asset groups -->
     <div class="form-group">
       <label class="col-sm-2 control-label" for="id_assets_list">Asset(s) selected:</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <div class="custom-control custom-checkbox cbx_assets">
           <!-- list of selected assets -->
         </div>
@@ -147,7 +165,7 @@ label.radio {
     <!-- Filter scan policies by engine name -->
     <div class="form-group" id="engine-buttons">
       <label class="col-sm-2 control-label" for="id_engine_name">Filter by Engine:</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <div class="btn-group btn-group-sm" role="group" data-toggle="buttons">
           <label class="btn btn-primary" engineId="0">
             <input type="radio" autocomplete="off">
@@ -166,7 +184,7 @@ label.radio {
     <!-- Filter scan policies by scan category -->
     <div class="form-group" id="category-buttons">
       <label class="col-sm-2 control-label" for="id_scan_category">Or, Filter by Category:</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <div class="btn-group btn-group-sm" role="group" data-toggle="buttons">
           <label class="btn btn-primary" categoryId="0">
             <input type="radio" autocomplete="off">All
@@ -183,7 +201,7 @@ label.radio {
     <!-- Scan policy selection -->
     <div class="form-group hidden" id="policies-div">
       <label class="col-sm-2 control-label" for="id_engine_policy">Select Policy:</label>
-      <div class="col-sm-4 custom-control custom-radio">
+      <div class="col-sm-5 custom-control custom-radio">
         {% for policy in scan_policies %}
         <label class="radio" label-id="{{ policy.id }}">
           <input
@@ -204,12 +222,119 @@ label.radio {
     <!-- Displayed when a policy is selected-->
     <div class="form-group hidden" id="engine-div">
       <label class="col-sm-2 control-label" for="id_engine_id">Select Engine:</label>
-      <div class="col-sm-5">
+      <div class="col-sm-6">
         <select id="id_engine" name="engine_id" class="form-control" required>
           <!-- autofilled by jQuery -->
         </select>
       </div>
     </div>
+
+    <!-- Advanced options -->
+    <!-- Displayed when a policy is selected-->
+    <div class="form-group hidden" id="options-div">
+      <label class="col-sm-2 control-label"><div id="show-options"><a>Advanced options</a></div></label>
+
+      <div class="col-sm-6">
+        <div class="menu-options jb" style="display: none;">
+          <div class="row vertical-align">
+            <label class="col-sm-4">Auto add new assets</label>
+            <div class="col-sm-8 no_padding">
+              <div class="btn-group btn-group-xs btn-autoaddassets" data-toggle="buttons">
+                <label class="btn btn-success active" id="lbl_autoaddassets_no">
+                  <input type="radio" name="autoaddassets" value="no" id="id_autoaddassets_no" autocomplete="off" checked="checked"> No
+                </label>
+                <label class="btn btn-primary" id="lbl_autoaddassets_yes">
+                  <input type="radio" name="autoaddassets" value="yes" id="id_autoaddassets_yes" autocomplete="off"> Yes
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-top: 1px solid #9a9d9e52">
+
+          <div class="row vertical-align">
+            <label class="col-sm-4">Email notification</label>
+            <div class="col-sm-8 no_padding">
+              <div class="btn-group btn-group-xs btn-emailnotif" data-toggle="buttons">
+                <label class="btn btn-success active" id="lbl_emailnotif_no">
+                  <input type="radio" name="emailnotif" value="no" id="id_emailnotif_no" autocomplete="off" checked="checked"> No
+                </label>
+                <label class="btn btn-primary" id="lbl_emailnotif_yes">
+                  <input type="radio" name="emailnotif" value="yes" id="id_emailnotif_yes" autocomplete="off"> Yes
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row vertical-align">
+            <label class="col-sm-4">Recipients emails</label>
+            <div class="col-sm-8 no_padding">
+              <input id="id_emailnotif_recipients" name="emailnotif_recipients" type="text" placeholder="cert@ex.com, alert@toto.io, ..." class="form-control form-control-xs"/>
+            </div>
+          </div>
+
+          <div class="row vertical-align">
+            <label class="col-sm-4">Subject</label>
+            <div class="col-sm-8 no_padding">
+              <input id="id_emailnotif_subject" name="emailnotif_subject" type="text" placeholder="[Patrowl] New report available" class="form-control form-control-xs"/>
+            </div>
+          </div>
+
+          <div class="row vertical-align">
+            <label class="col-sm-4">Attach report</label>
+            <div class="btn-group btn-group-xs btn-emailattachreport" data-toggle="buttons">
+              <label class="btn btn-success active" id="lbl_emailattachreport_no">
+                <input type="radio" name="emailattachreport" value="no" id="id_emailattachreport_no" autocomplete="off" checked="checked"> No
+              </label>
+              <label class="btn btn-primary" id="lbl_emailattachreport_yes">
+                <input type="radio" name="emailattachreport" value="yes" id="id_emailattachreport_yes" autocomplete="off"> Yes
+              </label>
+            </div>
+          </div>
+
+          <div class="row vertical-align">
+            <label class="col-sm-4">Condition</label>
+            <div class="col-sm-8">
+              <div class="form-group">
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="email_condition_always" name="email_condition" value="email_condition_always" class="custom-control-input" checked="">
+                  <label class="custom-control-label" for="email_condition_always">Always</label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="email_condition_severity_min" name="email_condition" value="email_condition_severity_min" class="custom-control-input">
+                  <label class="custom-control-label" for="email_condition_severity_min">
+                    Criticality at least
+                    <select class="custom-select" id="id_email_condition_severity_min_val" name="email_condition_severity_min_val">
+                      <option selected="info">Info</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="custom-control custom-radio">
+                  <input type="radio" id="email_condition_severity_is" name="email_condition" value="email_condition_severity_is" class="custom-control-input">
+                  <label class="custom-control-label" for="email_condition_severity_is">
+                    Criticality is
+                    <select class="custom-select" id="id_email_condition_severity_min_is" name="email_condition_severity_min_is">
+                      <option selected="info">Info</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- submit -->
     <div class="form-group hidden submit-div">
       <div class="col-sm-2">
       </div>
@@ -465,6 +590,7 @@ label.radio {
 
     $('#engine-buttons').bind('change', function(e){
       $('#policies-div').removeClass('hidden');
+      $('#options-div').removeClass('hidden');
       $("html, body").animate({ scrollTop: $(document).height() }, "slow");
       $('#category-buttons > div > div > label').removeClass('active');
       $('#category-buttons > div > div > label[categoryid=0]').addClass('active');
@@ -497,6 +623,7 @@ label.radio {
     // Unhide the engine select until a scan policy is selected
     $("#policies-div").change(function(e){
       $('#engine-div').removeClass('hidden');
+      $('#options-div').removeClass('hidden');
       $('div.submit-div').removeClass('hidden');
       $("html, body").animate({ scrollTop: $(document).height() }, "slow");
     });
@@ -515,6 +642,50 @@ label.radio {
             })
           );
         }
+      }
+    });
+
+    // Show/hide Advanced options
+    $('#show-options').click(function() {
+      $('.menu-options').toggle("slide", 200);
+    });
+
+    // Toggle Auto Add assets selection radio buttons styles
+    $('div.btn-autoaddassets').click(function (e) {
+      if (e.target.id != $('div.btn-autoaddassets label.active').attr('id')){
+        $('div.btn-autoaddassets label:not(.active) input').attr("checked", "checked");
+        $('div.btn-autoaddassets label.active input').removeAttr("checked", "checked");
+
+        $('div.btn-autoaddassets label.active').removeClass("btn-success");
+        $('div.btn-autoaddassets label.active').addClass("btn-primary");
+        $('div.btn-autoaddassets label:not(.active)').removeClass("btn-primary");
+        $('div.btn-autoaddassets label:not(.active)').addClass("btn-success");
+      }
+    });
+
+    // Toggle Email notification selection radio buttons styles
+    $('div.btn-emailnotif').click(function (e) {
+      if (e.target.id != $('div.btn-emailnotif label.active').attr('id')){
+        $('div.btn-emailnotif label:not(.active) input').attr("checked", "checked");
+        $('div.btn-emailnotif label.active input').removeAttr("checked", "checked");
+
+        $('div.btn-emailnotif label.active').removeClass("btn-success");
+        $('div.btn-emailnotif label.active').addClass("btn-primary");
+        $('div.btn-emailnotif label:not(.active)').removeClass("btn-primary");
+        $('div.btn-emailnotif label:not(.active)').addClass("btn-success");
+      }
+    });
+
+    // Toggle Email / Attach report selection radio buttons styles
+    $('div.btn-emailattachreport').click(function (e) {
+      if (e.target.id != $('div.btn-emailattachreport label.active').attr('id')){
+        $('div.btn-emailattachreport label:not(.active) input').attr("checked", "checked");
+        $('div.btn-emailattachreport label.active input').removeAttr("checked", "checked");
+
+        $('div.btn-emailattachreport label.active').removeClass("btn-success");
+        $('div.btn-emailattachreport label.active').addClass("btn-primary");
+        $('div.btn-emailattachreport label:not(.active)').removeClass("btn-primary");
+        $('div.btn-emailattachreport label:not(.active)').addClass("btn-success");
       }
     });
 
