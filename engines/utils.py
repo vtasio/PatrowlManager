@@ -20,10 +20,14 @@ import datetime
 import uuid
 from copy import deepcopy
 import re
+from settings.models import Setting
 # import logging
 # logger = logging.getLogger(__name__)
 
 ENGINE_HTTP_TIMEOUT=getattr(settings, 'ENGINE_HTTP_TIMEOUT', 600)
+HTTP_REQUEST_MAX_TIMEOUT=getattr(settings, 'HTTP_REQUEST_MAX_TIMEOUT', 60)
+
+
 
 def _get_engine_status(engine):
     engine_status = "undefined"
