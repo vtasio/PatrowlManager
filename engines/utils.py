@@ -475,6 +475,7 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
     # Initialize values
     domain_up = False
     ip_up = False
+    domain_unresolved = False
     for finding in findings:
         # get the hostnames received and check if they are known in the user' assets
         assets = []
@@ -658,10 +659,24 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                     severity="INFO", scan=scan)
                 asset.categories.add(new_tag)
                 asset.save()
-            if 'Failed to resolve' in finding['title'] and asset.type == "domain":
-                new_tag = _add_asset_tags(asset, 'Unresolved-domain')
-                asset.categories.add(new_tag)
-                asset.save()
+            if domain_unresolved is False:
+                if 'Failed to resolve' in finding['title'] and asset.type == "domain":
+                    domain_unresolved = True
+                    invalid_tag = _add_asset_tags(asset, 'Resolved-domain')
+                    asset.categories.remove(invalid_tag)
+                    asset.save()
+                    new_tag = _add_asset_tags(asset, 'Unresolved-domain')
+                    asset.categories.add(new_tag)
+                    asset.save()
+                else:
+                    invalid_tag = _add_asset_tags(asset, 'Unresolved-domain')
+                    asset.categories.remove(invalid_tag)
+                    asset.save()
+                    new_tag = _add_asset_tags(asset, 'Resolved-domain')
+                    asset.categories.add(new_tag)
+                    asset.save()
+
+
             if domain_up is False:
                 if 'Host' in finding['title'] and 'is up' in finding['title'] and asset.type == "domain":
                     domain_up = True
@@ -706,13 +721,6 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 service = re.findall(r"'(.*?)'", rawfinding.title)
                 invalid_tag = _add_asset_tags(asset, service[0])
                 asset.categories.remove(invalid_tag)
-                asset.save()
-            if 'Failed to resolve' in rawfinding.title and asset.type=="domain":
-                invalid_tag = _add_asset_tags(asset, 'Unresolved-domain')
-                asset.categories.remove(invalid_tag)
-                asset.save()
-                new_tag = _add_asset_tags(asset, 'Resolved-domain')
-                asset.categories.remove(new_tag)
                 asset.save()
 
     scan.save()
