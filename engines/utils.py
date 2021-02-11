@@ -639,44 +639,47 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                     Event.objects.create(message="{} Error in alerting".format(evt_prefix),
                         type="ERROR", severity="ERROR", scan=scan, description=str(e))
 
-        # Vtasio Add Tags
-        if ip_up is False:
-            if asset.type == "ip":
-                invalid_tag = _add_asset_tags(asset, 'active-ip')
-                asset.categories.remove(invalid_tag)
-                asset.save()
-                new_tag = _add_asset_tags(asset, 'inactive-ip')
+            # Vtasio Add Tags
+            if ip_up is False:
+                if asset.type == "ip":
+                    invalid_tag = _add_asset_tags(asset, 'active-ip')
+                    asset.categories.remove(invalid_tag)
+                    asset.save()
+                    new_tag = _add_asset_tags(asset, 'inactive-ip')
+                    asset.categories.add(new_tag)
+                    asset.save()
+            if 'is running on port' in finding['title']:
+                service = re.findall(r"'(.*?)'", finding['title'])
+                new_tag = _add_asset_tags(asset, service[0])
+                Event.objects.create(
+                    message="[EngineTasks/_import_findings()/scan_id={}] New Tag: {}".format(scan_id,
+                                                                                             service[0]),
+                    description="Asset: {}\nFinding: {}".format(asset.value, finding['title']), type="DEBUG",
+                    severity="INFO", scan=scan)
                 asset.categories.add(new_tag)
                 asset.save()
-        if 'is running on port' in finding['title']:
-            service = re.findall(r"'(.*?)'", finding['title'])
-            new_tag = _add_asset_tags(asset, service[0])
-            Event.objects.create(
-                message="[EngineTasks/_import_findings()/scan_id={}] New Tag: {}".format(scan_id,
-                                                                                         service[0]),
-                description="Asset: {}\nFinding: {}".format(asset.value, finding['title']), type="DEBUG",
-                severity="INFO", scan=scan)
-            asset.categories.add(new_tag)
-            asset.save()
-        if 'Failed to resolve' in finding['title'] and asset.type == "domain":
-            new_tag = _add_asset_tags(asset, 'inactive-domain')
-            asset.categories.add(new_tag)
-            asset.save()
-        if domain_up is False:
-            if 'Host' in finding['title'] and 'is up' in finding['title'] and asset.type == "domain":
-                domain_up = True
-                new_tag = _add_asset_tags(asset, 'active-domain')
+            if 'Failed to resolve' in finding['title'] and asset.type == "domain":
+                new_tag = _add_asset_tags(asset, 'Unresolved-domain')
                 asset.categories.add(new_tag)
                 asset.save()
-        if ip_up is False:
-            if ('Host' in finding['title'] and 'is up' in finding['title']) and asset.type == "ip":
-                ip_up = True
-                invalid_tag = _add_asset_tags(asset, 'inactive-ip')
-                asset.categories.remove(invalid_tag)
-                asset.save()
-                new_tag = _add_asset_tags(asset, 'active-ip')
-                asset.categories.add(new_tag)
-                asset.save()
+            if domain_up is False:
+                if 'Host' in finding['title'] and 'is up' in finding['title'] and asset.type == "domain":
+                    domain_up = True
+                    invalid_tag = _add_asset_tags(asset, 'inactive-domain')
+                    asset.categories.remove(invalid_tag)
+                    asset.save()
+                    new_tag = _add_asset_tags(asset, 'active-domain')
+                    asset.categories.add(new_tag)
+                    asset.save()
+            if ip_up is False:
+                if ('Host' in finding['title'] and 'is up' in finding['title']) and asset.type == "ip":
+                    ip_up = True
+                    invalid_tag = _add_asset_tags(asset, 'inactive-ip')
+                    asset.categories.remove(invalid_tag)
+                    asset.save()
+                    new_tag = _add_asset_tags(asset, 'active-ip')
+                    asset.categories.add(new_tag)
+                    asset.save()
 
 
 
@@ -705,8 +708,11 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 asset.categories.remove(invalid_tag)
                 asset.save()
             if 'Failed to resolve' in rawfinding.title and asset.type=="domain":
-                invalid_tag = _add_asset_tags(asset, 'inactive-domain')
+                invalid_tag = _add_asset_tags(asset, 'Unresolved-domain')
                 asset.categories.remove(invalid_tag)
+                asset.save()
+                new_tag = _add_asset_tags(asset, 'Resolved-domain')
+                asset.categories.remove(new_tag)
                 asset.save()
 
     scan.save()
