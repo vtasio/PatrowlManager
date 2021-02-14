@@ -281,9 +281,15 @@ class Finding(models.Model):
             #     "id": self.id,
             #     # rule.scope_attr+next(iter(rule.condition)): rule.condition.itervalues().next()
             # }
-            conv = json.loads(rule.condition)
-            for line in conv:
-                for key, value in line.items():
+            try:
+                conv = json.loads(rule.condition)
+                for line in conv:
+                    for key, value in line.items():
+                        kwargs.append(Q(**{rule.scope_attr + key: value}))
+                        # kwargs[rule.scope_attr + key]=value
+            except:
+                conv = rule.condition
+                for key, value in conv.items():
                     kwargs.append(Q(**{rule.scope_attr + key: value}))
                     #kwargs[rule.scope_attr + key]=value
 

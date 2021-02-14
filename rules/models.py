@@ -143,7 +143,7 @@ class Rule(models.Model):
             Event.objects.create(
                 message="[Alert][Rule={}]{}".format(self.title, message),
                 type="ALERT", severity="INFO")
-        elif self.target == 'addtag':
+        elif self.target in ['addtag','removetag']:
             autotag(self, asset)
 
         self.nb_matches += 1
@@ -335,16 +335,28 @@ def send_thehive_message(rule, message, asset, description):
                 type="ERROR", severity="ERROR")
 
 def autotag(rule, asset):
-    mess = "[Rule] Rule '{}' AutoTag creation (asset={})".format(rule, asset)
-    Event.objects.create(message=mess, type="CREATE", severity="DEBUG")
-    AuditLog.objects.create(
-        message=mess,
-        scope='rule', type='rule_add_autotag',
-        request_context=inspect.stack())
-    if asset:
-        new_tag = _add_asset_tags(asset, rule.title)
-        asset.categories.add(new_tag)
-        asset.save()
+    if rule.target == 'addtag':
+        mess = "[Rule] Rule '{}' AutoTag creation (asset={})".format(rule, asset)
+        Event.objects.create(message=mess, type="CREATE", severity="DEBUG")
+        AuditLog.objects.create(
+            message=mess,
+            scope='rule', type='rule_add_autotag',
+            request_context=inspect.stack())
+        if asset:
+            new_tag = _add_asset_tags(asset, rule.title)
+            asset.categories.add(new_tag)
+            asset.save()
+    elif rule.target == 'removetag':
+        mess = "[Rule] Rule '{}' AutoTag remove (asset={})".format(rule, asset)
+        Event.objects.create(message=mess, type="CREATE", severity="DEBUG")
+        AuditLog.objects.create(
+            message=mess,
+            scope='rule', type='rule_remove_autotag',
+            request_context=inspect.stack())
+        if asset:
+            invalid_tag = _add_asset_tags(asset, rule.title)
+            asset.categories.remove(invalid_tag)
+            asset.save()
 
 def _add_asset_tags(asset, new_value):
     new_tag = AssetCategory.objects.filter(value__iexact=new_value).first()
