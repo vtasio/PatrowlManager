@@ -26,7 +26,6 @@ from common.utils import encoding, pro_permission_required, pro_group_required
 import csv
 import copy
 
-# @pro_permission_required('assets.view_asset')
 @pro_group_required('AssetsViewer', 'AssetsManager')
 def list_assets_view(request):
     # Check team
@@ -100,7 +99,6 @@ def list_assets_view(request):
         # https://stackoverflow.com/questions/25831081/django-orm-dynamically-add-multiple-conditions-for-manytomanyfield
         for tag in filter_tag:
             assets_list = assets_list.filter(categories__value=tag)
-
 
     # Query
     if teamid_selected >= 0:

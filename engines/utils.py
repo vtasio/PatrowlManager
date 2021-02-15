@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from celery import shared_task, chord, group
 from .models import EngineInstance
-from assets.models import Asset, AssetGroup, AssetCategory
+from assets.models import Asset, AssetGroup
 from events.models import Event
 from events.utils import new_finding_alert, missing_finding_alert
 from findings.models import Finding, RawFinding
@@ -104,7 +104,7 @@ def _run_scan(evt_prefix, scan_id):
     #   * Scan options
     #   * Engine policy option
     #   * Application default setting (SCAN_JOB_DEFAULT_SPLIT_ASSETS)
-
+    assets_chunk_size = SCAN_JOB_DEFAULT_SPLIT_ASSETS
     if 'split_assets_by' in scan.scan_definition.engine_policy.options.keys():
         sab = scan.scan_definition.engine_policy.options['split_assets_by']
         if sab not in ['', None] and sab.isnumeric():
