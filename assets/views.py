@@ -618,7 +618,8 @@ def detail_asset_view(request, asset_id):
         'scan_defs': scan_defs,
         'investigation_links': investigation_links,
         'engines_stats': engines_stats,
-        'asset_scopes': list(engine_scopes.items())
+        'asset_scopes': list(engine_scopes.items()),
+        'asset_groups': asset_groups,
         })
 
 
