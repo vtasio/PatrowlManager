@@ -579,7 +579,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         legend: {
           display: false
         },
-        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 5,suggestedMax: +5}}],xAxes: [{barPercentage: 0.4}]},
+        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 5,suggestedMax: +10}}],xAxes: [{barPercentage: 0.4}]},
         animation: {
         duration: 20,
         onComplete: function () {
@@ -675,7 +675,7 @@ var chart_findings_by_group_id = {};
                 ticks: {
                   beginAtZero: true,
                   stepSize: 5,
-                  suggestedMax: +3
+                  suggestedMax: +10
                 }
             }],
             yAxes: [{
@@ -683,7 +683,7 @@ var chart_findings_by_group_id = {};
                 ticks: {
                   beginAtZero: true,
                   stepSize: 5,
-                  suggestedMax: +3
+                  suggestedMax: +10
                 }
             }]
         },
@@ -785,16 +785,16 @@ var chart_findings_by_service_tag_id = {};
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 1,
-                  suggestedMax: +3
+                  stepSize: 5,
+                  suggestedMax: +10
                 }
             }],
             yAxes: [{
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 1,
-                  suggestedMax: +3
+                  stepSize: 5,
+                  suggestedMax: +10
                 }
             }]
         },
@@ -866,7 +866,7 @@ ssl_config = {
       legend: {
         display: false
       },
-      scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 1,suggestedMax: +3}}],xAxes: [{barPercentage: 0.4}]},
+      scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 5,suggestedMax: +10}}],xAxes: [{barPercentage: 0.4}]},
       animation: {
       duration: 20,
       onComplete: function () {
