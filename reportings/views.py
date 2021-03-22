@@ -189,7 +189,7 @@ def homepage_dashboard_view(request):
     assetgroups_findings_stats = {}
     ags = assetgroups.all()
 
-    for assetgroup in ags:
+    for assetgroup in ags.exclude(name__icontains="service"): # opap specific
         assetgroups_findings_stats = findings.filter(asset__in=assetgroup.assets.all()).aggregate(
         nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
         nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0), When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
@@ -205,6 +205,35 @@ def homepage_dashboard_view(request):
         assetgroups_findings_stats_list.append(assetgroups_findings_stats)
 
     assetgroups_findings_stats_list = sorted(assetgroups_findings_stats_list, key = lambda i: (i['nb_critical'], i['nb_high'], i['nb_medium'], i['nb_low']), reverse=True)
+
+    # Findings per Service groups
+    servicegroups_findings_stats_list = []
+    servicegroups_findings_stats = {}
+    ags = assetgroups.all()
+
+    for assetgroup in ags.filter(name__icontains="service"):  # opap specific
+        servicegroups_findings_stats = findings.filter(asset__in=assetgroup.assets.all()).aggregate(
+            nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
+            nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),
+                                          When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
+            nb_high=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),
+                                      When(severity='high', then=1)), output_field=models.IntegerField()), 0),
+            nb_medium=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),
+                                        When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
+            nb_low=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),
+                                     When(severity='low', then=1)), output_field=models.IntegerField()), 0),
+            nb_info=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),
+                                      When(severity='info', then=1)), output_field=models.IntegerField()), 0),
+            nb_false_positive=Coalesce(
+                Sum(Case(When(status='falsepositive', then=1)), output_field=models.IntegerField()), 0),
+            nb_duplicate=Coalesce(Sum(Case(When(status='duplicate', then=1)), output_field=models.IntegerField()), 0),
+        )
+        servicegroups_findings_stats['name'] = assetgroup.name
+        servicegroups_findings_stats['id'] = assetgroup.id
+        servicegroups_findings_stats_list.append(servicegroups_findings_stats)
+
+    servicegroups_findings_stats_list = sorted(servicegroups_findings_stats_list, key=lambda i: (
+    i['nb_critical'], i['nb_high'], i['nb_medium'], i['nb_low']), reverse=True)
 
     # SSLLABS rates
 
@@ -319,7 +348,8 @@ def homepage_dashboard_view(request):
         'cxe_stats': cxe_stats,
         'assetgroups_findings_stats_list':assetgroups_findings_stats_list,
         'teams': teams,
-        'ssllabs_stats':ssllabs_stats
+        'ssllabs_stats':ssllabs_stats,
+        "servicegroups_findings_stats_list":servicegroups_findings_stats_list,
     })
 
 

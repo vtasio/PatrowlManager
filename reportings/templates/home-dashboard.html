@@ -625,26 +625,21 @@ var chart_findings_by_group_info = [];
 var chart_findings_by_group_false_positive = [];
 var chart_findings_by_group_duplicate = [];
 var chart_findings_by_group_id = {};
-{% counter as counter%}
-{% for group in assetgroups_findings_stats_list %}
-  {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
-    {% if "service" not in group.name and "Service" not in group.name  %} //opap specific
-      {% if counter < 6 %}
-        chart_findings_by_group.push("{{ group.name }}");
-        chart_findings_by_group_id["{{ group.name }}"]={{ group.id }};
-        chart_findings_by_group_critical.push("{{ group.nb_critical }}");
-        chart_findings_by_group_high.push("{{ group.nb_high }}");
-        chart_findings_by_group_medium.push("{{ group.nb_medium }}");
-        chart_findings_by_group_low.push("{{ group.nb_low }}");
-        chart_findings_by_group_info.push("{{ group.nb_info }}");
-        chart_findings_by_group_false_positive.push("{{ group.nb_false_positive }}");
-        chart_findings_by_group_duplicate.push("{{ group.nb_duplicate }}");
-        {{ counter|add:"1" }}
-      {% endif %}
-    {% endif %}
-  {% endif %}
-{% endfor %}
-
+    {% for group in assetgroups_findings_stats_list %}
+          {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
+              {% if forloop.counter0 < 5 %}
+                chart_findings_by_group.push("{{ group.name }}");
+                chart_findings_by_group_id["{{ group.name }}"]={{ group.id }};
+                chart_findings_by_group_critical.push("{{ group.nb_critical }}");
+                chart_findings_by_group_high.push("{{ group.nb_high }}");
+                chart_findings_by_group_medium.push("{{ group.nb_medium }}");
+                chart_findings_by_group_low.push("{{ group.nb_low }}");
+                chart_findings_by_group_info.push("{{ group.nb_info }}");
+                chart_findings_by_group_false_positive.push("{{ group.nb_false_positive }}");
+                chart_findings_by_group_duplicate.push("{{ group.nb_duplicate }}");
+              {% endif %}
+        {% endif %}
+    {% endfor %}
 
 
   cfbc_config_by_group = {
@@ -736,11 +731,11 @@ var chart_findings_by_service_tag_info = [];
 var chart_findings_by_service_tag_false_positive = [];
 var chart_findings_by_service_tag_duplicate = [];
 var chart_findings_by_service_tag_id = {};
-{% counter as counter%}
-{% for group in assetgroups_findings_stats_list %}
+
+{% for group in servicegroups_findings_stats_list %}
   {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
-    {% if "service" in group.name or "Service" in group.name  %} //opap specific
-      {% if counter < 6 %}
+    {% if forloop.counter0 < 5 %}
+
         chart_findings_by_service_tag.push("{{ group.name }}");
         chart_findings_by_service_tag_id["{{ group.name }}"]={{ group.id }};
         chart_findings_by_service_tag_critical.push("{{ group.nb_critical }}");
@@ -750,10 +745,9 @@ var chart_findings_by_service_tag_id = {};
         chart_findings_by_service_tag_info.push("{{ group.nb_info }}");
         chart_findings_by_service_tag_false_positive.push("{{ group.nb_false_positive }}");
         chart_findings_by_service_tag_duplicate.push("{{ group.nb_duplicate }}");
-        {{ counter|add:"1" }}
+
       {% endif %}
     {% endif %}
-  {% endif %}
 {% endfor %}
 
 
