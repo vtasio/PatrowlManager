@@ -227,11 +227,11 @@ td.bg-grade-F-high {background-color: black; color: white;}
     <div class="tile col-sm-15">
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Findings by criticities</h4>
+          <h4>Findings by criticalities</h4>
         </div>
         <div class="tile-body">
           <div id="findings-by-criticities">
-            <canvas id="chart-findings-by-criticities" width="200" height="200"/>
+            <canvas id="chart-findings-by-criticities"  height="250"/>
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-group">
-        <canvas id="chart_findings_by_group" width="600" height="200"/>
+        <canvas id="chart_findings_by_group" height="250"/>
         </div>
           {% comment %} <table class="table table-hover table-tile">
             <thead>
@@ -342,6 +342,106 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div>
+    <div class="tile col-sm-15">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>SSL Grading</h4>
+        </div>
+        <div class="tile-body">
+          <div id="ssllabs-findings">
+            <canvas id="chart-ssllabs-findings"  height="250"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tile col-sm-25">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Top five Service Group Per Finding</h4>
+        </div>
+        <div class="tile-body">
+        <div id="chart-findings-by-service-tag">
+        <canvas id="chart_findings_by_service_tag" height="250"/>
+        </div>
+          {% comment %} <table class="table table-hover table-tile">
+            <thead>
+              <tr>
+                <th style="text-align: center;">Group</th>
+                <th style="text-align: center;">Critical</th>
+                <th style="text-align: center;">High</th>
+                <th style="text-align: center;">Medium</th>
+                <th style="text-align: center;">Low</th>
+                <th style="text-align: center;">Info</th>
+                <th style="text-align: center;">False Positive</th>
+                <th style="text-align: center;">Duplicate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for finding in top_critical_findings %}
+              <tr class='dblclickable-row' data-href='/findings/details/{{finding.id}}'>
+                {% if finding.severity == 'critical' %}
+                <td><span class="label label-critical">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'high' %}
+                <td><span class="label label-high">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'medium' or finding.severity == 'moderate' %}
+                <td><span class="label label-medium">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'low' %}
+                <td><span class="label label-low">{{ finding.severity }}</span></td>
+                {% else %}
+                <td><span class="label label-info">{{ finding.severity }}</span></td>
+                {% endif %}
+                <td>{{finding.title|truncatechars:40}}</td>
+                <td>{{finding.asset_name|truncatechars:30}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table> {% endcomment %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End 3rd row -->
+  <div class="row equal">
+    <!-- <div class="tile col-sm-15">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Top CVSS Score / Findings</h4>
+        </div>
+        <div class="tile-body">
+          <dl class="dl-horizontal">
+            <dt>#CVSS = 10: </dt><dd>{{cvss_scores.eq10}}</dd>
+            <dt>9.0 <= #CVSS < 10</dt><dd>{{cvss_scores.gte9}}</dd>
+            <dt>7.0 <= #CVSS < 9.0: </dt><dd>{{cvss_scores.gte7}}</dd>
+            <dt>5.0 <= #CVSS < 7.0 : </dt><dd>{{cvss_scores.5to7}}</dd>
+            <dt>#CVSS < 5.0: </dt><dd>{{cvss_scores.lte5}}</dd>
+          </dl>
+        </div>
+      </div>
+    </div> -->
+    <!-- <div class="tile col-sm-15">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Top CVE</h4>
+        </div>
+        <div class="tile-body">
+          {% for cve in cxe_stats.top_cve %}
+            <a href='/findings/list?_reference={{cve.0}}&_reference_cond=CVE'><span class="badge badge-secondary small">{{cve.0}}: #{{cve.1}}</span></a>
+          {% endfor %}
+        </div>
+      </div>
+    </div> -->
+    <!-- <div class="tile col-sm-15">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Top CWE</h4>
+        </div>
+        <div class="tile-body">
+          {% for cwe in cxe_stats.top_cwe %}
+            <a href='/findings/list?_reference={{cwe.0}}&_reference_cond=CWE'><span class="badge badge-secondary small">{{cwe.0}}: #{{cwe.1}}</span></a>
+          {% endfor %}
+        </div>
+      </div>
+    </div> -->
     <div class="tile col-sm-35">
       <div class="tile-content">
         <div class="tile-header with-border">
@@ -408,50 +508,6 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div>
-  </div>
-  <!-- End 3rd row -->
-  <div class="row equal">
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Top CVSS Score / Findings</h4>
-        </div>
-        <div class="tile-body">
-          <dl class="dl-horizontal">
-            <dt>#CVSS = 10: </dt><dd>{{cvss_scores.eq10}}</dd>
-            <dt>9.0 <= #CVSS < 10</dt><dd>{{cvss_scores.gte9}}</dd>
-            <dt>7.0 <= #CVSS < 9.0: </dt><dd>{{cvss_scores.gte7}}</dd>
-            <dt>5.0 <= #CVSS < 7.0 : </dt><dd>{{cvss_scores.5to7}}</dd>
-            <dt>#CVSS < 5.0: </dt><dd>{{cvss_scores.lte5}}</dd>
-          </dl>
-        </div>
-      </div>
-    </div>
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Top CVE</h4>
-        </div>
-        <div class="tile-body">
-          {% for cve in cxe_stats.top_cve %}
-            <a href='/findings/list?_reference={{cve.0}}&_reference_cond=CVE'><span class="badge badge-secondary small">{{cve.0}}: #{{cve.1}}</span></a>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Top CWE</h4>
-        </div>
-        <div class="tile-body">
-          {% for cwe in cxe_stats.top_cwe %}
-            <a href='/findings/list?_reference={{cwe.0}}&_reference_cond=CWE'><span class="badge badge-secondary small">{{cwe.0}}: #{{cwe.1}}</span></a>
-            <!-- <a href='https://cwe.mitre.org/data/definitions/{{cwe.0}}.html'><span class="badge badge-secondary small">{{cwe.0}}: #{{cwe.1}}</span></a> -->
-          {% endfor %}
-        </div>
-      </div>
-    </div>
 
     <div class="tile col-sm-25">
       <div class="tile-content">
@@ -506,9 +562,9 @@ td.bg-grade-F-high {background-color: black; color: white;}
           datasets: [{
               backgroundColor: [
                   "#cc0500",
-                  "#df3d03",
                   "#f9a009",
                   "#ffcb0d",
+                  "#74b72e",
                   "#3498db"
               ]
           }],
@@ -516,14 +572,14 @@ td.bg-grade-F-high {background-color: black; color: white;}
       },
 
       options: {
-        responsive: false,
-        // responsive: true,
+        //responsive: false,
+        responsive: true,
         //maintainAspectRatio: false,
         // maintainAspectRatio: true,
         legend: {
           display: false
         },
-        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 1,suggestedMax: +5}}],xAxes: [{barPercentage: 0.4}]},
+        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 1,suggestedMax: +3}}],xAxes: [{barPercentage: 0.4}]},
         animation: {
         duration: 20,
         onComplete: function () {
@@ -557,7 +613,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
     window.cfbc_pie_chart = new Chart(ctx_findings, cfbc_config);
 
     // Hide 'info' findings
-    window.cfbc_pie_chart.getDatasetMeta(0).data[4].hidden = true;
+    //window.cfbc_pie_chart.getDatasetMeta(0).data[4].hidden = true;
     window.cfbc_pie_chart.update();
 
 var chart_findings_by_group = [];
@@ -568,18 +624,23 @@ var chart_findings_by_group_low = [];
 var chart_findings_by_group_info = [];
 var chart_findings_by_group_false_positive = [];
 var chart_findings_by_group_duplicate = [];
+var chart_findings_by_group_id = {};
+{% counter as counter%}
 {% for group in assetgroups_findings_stats_list %}
-  {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0  %}
-    {% if forloop.counter < 11 %}
-      chart_findings_by_group.push("{{ group.name }}");
-      chart_findings_by_group_critical.push("{{ group.nb_critical }}");
-      chart_findings_by_group_high.push("{{ group.nb_high }}");
-      chart_findings_by_group_medium.push("{{ group.nb_medium }}");
-      chart_findings_by_group_low.push("{{ group.nb_low }}");
-      chart_findings_by_group_info.push("{{ group.nb_info }}");
-      chart_findings_by_group_false_positive.push("{{ group.nb_false_positive }}");
-      chart_findings_by_group_duplicate.push("{{ group.nb_duplicate }}");
-      {{ forloop.counter }}
+  {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
+    {% if "service" not in group.name and "Service" not in group.name  %} //opap specific
+      {% if counter < 6 %}
+        chart_findings_by_group.push("{{ group.name }}");
+        chart_findings_by_group_id["{{ group.name }}"]={{ group.id }};
+        chart_findings_by_group_critical.push("{{ group.nb_critical }}");
+        chart_findings_by_group_high.push("{{ group.nb_high }}");
+        chart_findings_by_group_medium.push("{{ group.nb_medium }}");
+        chart_findings_by_group_low.push("{{ group.nb_low }}");
+        chart_findings_by_group_info.push("{{ group.nb_info }}");
+        chart_findings_by_group_false_positive.push("{{ group.nb_false_positive }}");
+        chart_findings_by_group_duplicate.push("{{ group.nb_duplicate }}");
+        {{ counter|add:"1" }}
+      {% endif %}
     {% endif %}
   {% endif %}
 {% endfor %}
@@ -592,9 +653,9 @@ var chart_findings_by_group_duplicate = [];
           labels: chart_findings_by_group,
           datasets: [
           {label: 'Critical', data: chart_findings_by_group_critical, backgroundColor: '#cc0500'},
-          {label: 'High', data: chart_findings_by_group_high, backgroundColor: '#df3d03'},
-          {label: 'Medium', data: chart_findings_by_group_medium, backgroundColor: '#f9a009'},
-          {label: 'Low', data: chart_findings_by_group_low, backgroundColor: '#ffcb0d'},
+          {label: 'High', data: chart_findings_by_group_high, backgroundColor: '#f9a009'},
+          {label: 'Medium', data: chart_findings_by_group_medium, backgroundColor: '#ffcb0d'},
+          {label: 'Low', data: chart_findings_by_group_low, backgroundColor: '#74b72e'},
           //{label: 'Info', data: chart_findings_by_group_info, backgroundColor: '#ffcb0d'},
           //{label: 'False Positive', data: chart_findings_by_group_false_positive, backgroundColor: '#ffcb0d'},
           //{label: 'Duplicate', data: chart_findings_by_group_duplicate, backgroundColor: '#ffcb0d'},
@@ -610,22 +671,42 @@ var chart_findings_by_group_duplicate = [];
         },
         scales: {
             xAxes: [{
-                stacked: true,
+                //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 1
+                  stepSize: 1,
+                  suggestedMax: +3
                 }
             }],
             yAxes: [{
-                stacked: true,
+                //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 1
+                  stepSize: 1,
+                  suggestedMax: +3
                 }
             }]
         },
-        responsive: false,
-        // responsive: true,
+        animation: {
+        duration: 20,
+        onComplete: function () {
+            var chartInstance = this.chart,
+                ctx = chartInstance.ctx;
+            ctx.font = Chart.helpers.fontString(9, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            this.data.datasets.forEach(function (dataset, i) {
+                var meta = chartInstance.controller.getDatasetMeta(i);
+                meta.data.forEach(function (bar, index) {
+                    var data = dataset.data[index];
+                    ctx.fillText(data, bar._model.x + 10, bar._model.y + 6);
+                });
+            });
+        }
+    },
+        //responsive: false,
+        responsive: true,
         maintainAspectRatio: false,
         // maintainAspectRatio: true,
         legend: {
@@ -637,11 +718,198 @@ var chart_findings_by_group_duplicate = [];
     var chart_findings_by_group = document.getElementById("chart_findings_by_group").getContext("2d");
     window.cfbc_stacked_bars= new Chart(chart_findings_by_group,cfbc_config_by_group);
 
+    document.getElementById("chart_findings_by_group").onclick = function(evt){
+			var activePoints = cfbc_stacked_bars.getElementsAtEvent(evt);
+			var firstPoint = activePoints[0];
+			var label = cfbc_stacked_bars.data.labels[firstPoint._index];
+			var value = cfbc_stacked_bars.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+			if (firstPoint !== undefined)
+        window.location = '/assets/groups/details/'+chart_findings_by_group_id[label];
+		};
+
+var chart_findings_by_service_tag = [];
+var chart_findings_by_service_tag_critical = [];
+var chart_findings_by_service_tag_high = [];
+var chart_findings_by_service_tag_medium = [];
+var chart_findings_by_service_tag_low = [];
+var chart_findings_by_service_tag_info = [];
+var chart_findings_by_service_tag_false_positive = [];
+var chart_findings_by_service_tag_duplicate = [];
+var chart_findings_by_service_tag_id = {};
+{% counter as counter%}
+{% for group in assetgroups_findings_stats_list %}
+  {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
+    {% if "service" in group.name or "Service" in group.name  %} //opap specific
+      {% if counter < 6 %}
+        chart_findings_by_service_tag.push("{{ group.name }}");
+        chart_findings_by_service_tag_id["{{ group.name }}"]={{ group.id }};
+        chart_findings_by_service_tag_critical.push("{{ group.nb_critical }}");
+        chart_findings_by_service_tag_high.push("{{ group.nb_high }}");
+        chart_findings_by_service_tag_medium.push("{{ group.nb_medium }}");
+        chart_findings_by_service_tag_low.push("{{ group.nb_low }}");
+        chart_findings_by_service_tag_info.push("{{ group.nb_info }}");
+        chart_findings_by_service_tag_false_positive.push("{{ group.nb_false_positive }}");
+        chart_findings_by_service_tag_duplicate.push("{{ group.nb_duplicate }}");
+        {{ counter|add:"1" }}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+
+
+
+  cfbc_config_by_service_tag = {
+      type: 'horizontalBar',
+      data: {
+          labels: chart_findings_by_service_tag,
+          datasets: [
+          {label: 'Critical', data: chart_findings_by_service_tag_critical, backgroundColor: '#cc0500'},
+          {label: 'High', data: chart_findings_by_service_tag_high, backgroundColor: '#f9a009'},
+          {label: 'Medium', data: chart_findings_by_service_tag_medium, backgroundColor: '#ffcb0d'},
+          {label: 'Low', data: chart_findings_by_service_tag_low, backgroundColor: '#74b72e'},
+          //{label: 'Info', data: chart_findings_by_service_tag_info, backgroundColor: '#ffcb0d'},
+          //{label: 'False Positive', data: chart_findings_by_service_tag_false_positive, backgroundColor: '#ffcb0d'},
+          //{label: 'Duplicate', data: chart_findings_by_service_tag_duplicate, backgroundColor: '#ffcb0d'},
+          ]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            display: true,
+            align: 'center',
+            anchor: 'center'
+            }
+        },
+        scales: {
+            xAxes: [{
+                //stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                  stepSize: 1,
+                  suggestedMax: +3
+                }
+            }],
+            yAxes: [{
+                //stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                  stepSize: 1,
+                  suggestedMax: +3
+                }
+            }]
+        },
+        animation: {
+        duration: 20,
+        onComplete: function () {
+            var chartInstance = this.chart,
+                ctx = chartInstance.ctx;
+            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+
+            this.data.datasets.forEach(function (dataset, i) {
+                var meta = chartInstance.controller.getDatasetMeta(i);
+                meta.data.forEach(function (bar, index) {
+                    var data = dataset.data[index];
+                    ctx.fillText(data, bar._model.x + 10, bar._model.y + 8);
+                });
+            });
+        }
+    },
+        //responsive: false,
+        responsive: true,
+        maintainAspectRatio: false,
+        // maintainAspectRatio: true,
+        legend: {
+          display: true
+        }
+      }
+    };
+
+    var chart_findings_by_service_tag = document.getElementById("chart_findings_by_service_tag").getContext("2d");
+    window.cfbc_stacked_bars= new Chart(chart_findings_by_service_tag,cfbc_config_by_service_tag);
+
+    document.getElementById("chart_findings_by_service_tag").onclick = function(evt){
+			var activePoints = cfbc_stacked_bars.getElementsAtEvent(evt);
+			var firstPoint = activePoints[0];
+			var label = cfbc_stacked_bars.data.labels[firstPoint._index];
+			var value = cfbc_stacked_bars.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+			if (firstPoint !== undefined)
+        window.location = '/assets/groups/details/'+chart_findings_by_service_tag_id[label];
+		};
+
+    var chart_ssllabs_findings;
+
+ssl_config = {
+    type: 'bar',
+    data: {
+        datasets: [{
+            backgroundColor: [
+                "#186a3b",
+                "#1d8348",
+                "#2ecc71",
+                "#d4ac0d",
+                "#f4d03f",
+                "#d35400",
+                "#cb4335",
+                "#cb4335"
+            ]
+        }],
+        labels: ["A","A+","B", "C", "D","F", "G", "T"]
+    },
+
+    options: {
+      //responsive: false,
+      responsive: true,
+      //maintainAspectRatio: false,
+      // maintainAspectRatio: true,
+      legend: {
+        display: false
+      },
+      scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 1,suggestedMax: +3}}],xAxes: [{barPercentage: 0.4}]},
+      animation: {
+      duration: 20,
+      onComplete: function () {
+          var chartInstance = this.chart,
+              ctx = chartInstance.ctx;
+          ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+
+          this.data.datasets.forEach(function (dataset, i) {
+              var meta = chartInstance.controller.getDatasetMeta(i);
+              meta.data.forEach(function (bar, index) {
+                  var data = dataset.data[index];
+                  ctx.fillText(data, bar._model.x, bar._model.y - 5);
+              });
+          });
+      }
+  }
+    }
+  };
+
+  ssl_config["data"]["datasets"][0]["data"] = new Array(
+    {{ssllabs_stats.nb_A}},
+    {{ssllabs_stats.nb_A_plus}},
+    {{ssllabs_stats.nb_B}},
+    {{ssllabs_stats.nb_C}},
+    {{ssllabs_stats.nb_D}},
+    {{ssllabs_stats.nb_E}},
+    {{ssllabs_stats.nb_F}},
+    {{ssllabs_stats.nb_G}},
+    {{ssllabs_stats.nb_T}}
+    //{{global_stats.findings.info}}
+  );
+
+  var ssl_findings = document.getElementById("chart-ssllabs-findings").getContext("2d");
+  window.ssl_pie_chart = new Chart(ssl_findings, ssl_config);
+
+
     // jQuery
     url = new URL(window.location.href);
     $('#team_select').val(url.searchParams.get("team", "-1"))
 
-    // Reload on team selection change
+    // Reload on team selection change 
     $('#team_select').on('change', function() {
       url.searchParams.set("team", this.value);
       window.location = url.search;
