@@ -181,3 +181,7 @@ def is_team_admin(user):
             break
 
     return is_team_admin
+
+@register.simple_tag
+def counter():
+    return 0

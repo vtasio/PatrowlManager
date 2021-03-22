@@ -205,6 +205,23 @@ def homepage_dashboard_view(request):
         assetgroups_findings_stats_list.append(assetgroups_findings_stats)
 
     assetgroups_findings_stats_list = sorted(assetgroups_findings_stats_list, key = lambda i: (i['nb_critical'], i['nb_high'], i['nb_medium'], i['nb_low']), reverse=True)
+
+    # SSLLABS rates
+
+    ssllabs_stats = findings.filter(engine_type="SSLLABS").aggregate(
+    nb_A=Coalesce(Sum(Case(When(raw_data='A', then=1)), output_field=models.IntegerField()), 0),
+    nb_A_plus=Coalesce(Sum(Case(When(raw_data='A+', then=1)), output_field=models.IntegerField()), 0),
+    nb_B=Coalesce(Sum(Case(When(raw_data='B', then=1)), output_field=models.IntegerField()), 0),
+    nb_C=Coalesce(Sum(Case(When(raw_data='C', then=1)), output_field=models.IntegerField()), 0),
+    nb_D=Coalesce(Sum(Case(When(raw_data='D', then=1)), output_field=models.IntegerField()), 0),
+    nb_E=Coalesce(Sum(Case(When(raw_data='E', then=1)), output_field=models.IntegerField()), 0),
+    nb_F=Coalesce(Sum(Case(When(raw_data='F', then=1)), output_field=models.IntegerField()), 0),
+    nb_G=Coalesce(Sum(Case(When(raw_data='G', then=1)), output_field=models.IntegerField()), 0),
+    nb_T=Coalesce(Sum(Case(When(raw_data='T', then=1)), output_field=models.IntegerField()), 0),
+    )
+
+
+
     # Critical findings
     top_critical_findings = []
     MAX_CF = 6
@@ -301,7 +318,8 @@ def homepage_dashboard_view(request):
         'cvss_scores': cvss_scores,
         'cxe_stats': cxe_stats,
         'assetgroups_findings_stats_list':assetgroups_findings_stats_list,
-        'teams': teams
+        'teams': teams,
+        'ssllabs_stats':ssllabs_stats
     })
 
 
