@@ -593,7 +593,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
                 var meta = chartInstance.controller.getDatasetMeta(i);
                 meta.data.forEach(function (bar, index) {
                     var data = dataset.data[index];
-                    ctx.fillText(data, bar._model.x, bar._model.y - 2);
+                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
                 });
             });
         }
@@ -640,6 +640,7 @@ var chart_findings_by_group_id = {};
               {% endif %}
         {% endif %}
     {% endfor %}
+
 
 
   cfbc_config_by_group = {
