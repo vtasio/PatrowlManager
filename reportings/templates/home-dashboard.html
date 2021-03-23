@@ -243,7 +243,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-group">
-        <canvas id="chart_findings_by_group" height="250"/>
+        <canvas id="chart_findings_by_group" height="280"/>
         </div>
           {% comment %} <table class="table table-hover table-tile">
             <thead>
@@ -361,7 +361,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-service-tag">
-        <canvas id="chart_findings_by_service_tag" height="250"/>
+        <canvas id="chart_findings_by_service_tag" height="280"/>
         </div>
           {% comment %} <table class="table table-hover table-tile">
             <thead>
@@ -579,7 +579,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         legend: {
           display: false
         },
-        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 5,suggestedMax: +20}}],xAxes: [{barPercentage: 0.4}]},
+        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 50,suggestedMax: +60}}],xAxes: [{barPercentage: 0.4}]},
         animation: {
         duration: 20,
         onComplete: function () {
@@ -593,7 +593,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
                 var meta = chartInstance.controller.getDatasetMeta(i);
                 meta.data.forEach(function (bar, index) {
                     var data = dataset.data[index];
-                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                    ctx.fillText(data, bar._model.x, bar._model.y - 2);
                 });
             });
         }
@@ -669,7 +669,7 @@ var chart_findings_by_group_id = {};
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 5,
+                  stepSize: 30,
                   suggestedMax: +20
                 }
             }],
@@ -677,7 +677,7 @@ var chart_findings_by_group_id = {};
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 5,
+                  stepSize: 30,
                   suggestedMax: +20
                 }
             }]
@@ -779,7 +779,7 @@ var chart_findings_by_service_tag_id = {};
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 5,
+                  stepSize: 30,
                   suggestedMax: +20
                 }
             }],
@@ -787,7 +787,7 @@ var chart_findings_by_service_tag_id = {};
                 //stacked: true,
                 ticks: {
                   beginAtZero: true,
-                  stepSize: 5,
+                  stepSize: 30,
                   suggestedMax: +20
                 }
             }]
