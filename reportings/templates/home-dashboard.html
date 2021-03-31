@@ -227,7 +227,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
     <div class="tile col-sm-15">
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Findings by criticalities</h4>
+          <h4>Findings by criticality</h4>
         </div>
         <div class="tile-body">
           <div id="findings-by-criticities">
@@ -239,7 +239,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
     <div class="tile col-sm-25">
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Top five Groups Per Finding</h4>
+          <h4>Top five Groups Per Technical Owner</h4>
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-group">
@@ -357,7 +357,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
     <div class="tile col-sm-25">
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Top five Service Group Per Finding</h4>
+          <h4>Vulnerabilities per asset (top-5)</h4>
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-service-tag">
@@ -554,6 +554,24 @@ td.bg-grade-F-high {background-color: black; color: white;}
 
 <script>
 
+const totalizer = {
+      id: 'totalizer',
+      beforeUpdate: chart => {
+        let totals = {};
+        chart.data.datasets.forEach((dataset, row) => {
+          if (chart.isDatasetVisible(row)) {
+            dataset.data.forEach((value, col) => {
+              totals[col] = totals[col] || {}
+              totals[col][row] = (totals[col][row - 1] || 0) + value
+            })
+          }
+        })
+        chart.$totalizer = {
+          totals: totals
+        }
+      }
+    }
+
   var chart_findings_by_criticities;
 
   cfbc_config = {
@@ -616,15 +634,15 @@ td.bg-grade-F-high {background-color: black; color: white;}
     //window.cfbc_pie_chart.getDatasetMeta(0).data[4].hidden = true;
     window.cfbc_pie_chart.update();
 
-var chart_findings_by_group = [];
-var chart_findings_by_group_critical = [];
-var chart_findings_by_group_high = [];
-var chart_findings_by_group_medium = [];
-var chart_findings_by_group_low = [];
-var chart_findings_by_group_info = [];
-var chart_findings_by_group_false_positive = [];
-var chart_findings_by_group_duplicate = [];
-var chart_findings_by_group_id = {};
+    var chart_findings_by_group = [];
+    var chart_findings_by_group_critical = [];
+    var chart_findings_by_group_high = [];
+    var chart_findings_by_group_medium = [];
+    var chart_findings_by_group_low = [];
+    var chart_findings_by_group_info = [];
+    var chart_findings_by_group_false_positive = [];
+    var chart_findings_by_group_duplicate = [];
+    var chart_findings_by_group_id = {};
     {% for group in assetgroups_findings_stats_list %}
           {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
               {% if forloop.counter0 < 5 %}
@@ -641,78 +659,83 @@ var chart_findings_by_group_id = {};
         {% endif %}
     {% endfor %}
 
-
-
-  cfbc_config_by_group = {
+    new Chart("chart_findings_by_group",{
       type: 'horizontalBar',
+      plugins: [totalizer],
       data: {
           labels: chart_findings_by_group,
           datasets: [
-          {label: 'Critical', data: chart_findings_by_group_critical, backgroundColor: '#cc0500'},
-          {label: 'High', data: chart_findings_by_group_high, backgroundColor: '#f9a009'},
-          {label: 'Medium', data: chart_findings_by_group_medium, backgroundColor: '#ffcb0d'},
-          {label: 'Low', data: chart_findings_by_group_low, backgroundColor: '#74b72e'},
-          //{label: 'Info', data: chart_findings_by_group_info, backgroundColor: '#ffcb0d'},
-          //{label: 'False Positive', data: chart_findings_by_group_false_positive, backgroundColor: '#ffcb0d'},
-          //{label: 'Duplicate', data: chart_findings_by_group_duplicate, backgroundColor: '#ffcb0d'},
+            {label: 'Critical', data: chart_findings_by_group_critical, backgroundColor: '#cc0500'},
+            {label: 'High', data: chart_findings_by_group_high, backgroundColor: '#f9a009'},
+            {label: 'Medium', data: chart_findings_by_group_medium, backgroundColor: '#ffcb0d'},
+            {label: 'Low', data: chart_findings_by_group_low, backgroundColor: '#74b72e'},
+            //{label: 'Info', data: chart_findings_by_group_info, backgroundColor: '#ffcb0d'},
+            //{label: 'False Positive', data: chart_findings_by_group_false_positive, backgroundColor: '#ffcb0d'},
+            //{label: 'Duplicate', data: chart_findings_by_group_duplicate, backgroundColor: '#ffcb0d'},
           ]
       },
       options: {
-        plugins: {
-          datalabels: {
-            display: true,
-            align: 'center',
-            anchor: 'center'
-            }
-        },
         scales: {
             xAxes: [{
-                //stacked: true,
+                stacked: true,
                 ticks: {
                   beginAtZero: true,
                   stepSize: 30,
-                  suggestedMax: +20
+                  suggestedMax: +20,
+                  minBarLength: 20
                 }
             }],
             yAxes: [{
-                //stacked: true,
+                stacked: true,
                 ticks: {
                   beginAtZero: true,
                   stepSize: 30,
-                  suggestedMax: +20
+                  suggestedMax: +20,
+                  minBarLength: 20
                 }
             }]
         },
-        animation: {
-        duration: 20,
-        onComplete: function () {
-            var chartInstance = this.chart,
-                ctx = chartInstance.ctx;
-            ctx.font = Chart.helpers.fontString(9, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-
-            this.data.datasets.forEach(function (dataset, i) {
-                var meta = chartInstance.controller.getDatasetMeta(i);
-                meta.data.forEach(function (bar, index) {
-                    var data = dataset.data[index];
-                    ctx.fillText(data, bar._model.x + 10, bar._model.y + 6);
-                });
-            });
-        }
-    },
-        //responsive: false,
+        plugins: {
+          datalabels: {
+            display: function(ctx) {
+              return ctx.dataset.data[ctx.dataIndex] > 0; // or >= 1 or ...
+            },
+            formatter: (value, ctx) => {
+              const total = ctx.chart.$totalizer.totals[ctx.dataIndex][ctx.datasetIndex]
+            },
+            labels: {
+              title: {
+                font: {
+                  weight: 'bold'
+                }
+              }
+            },
+            color: function(ctx) {
+             var index = ctx.dataIndex;
+             var value = ctx.dataset.data[index];
+             //Inside the "dataset" we look for the "labels" we are using
+             //and store them in a variable
+             var valueWhite = ctx.dataset.label;
+             //We make the condition: if a value of the label is "Strong blue"
+             //then we color this label 'white'
+             if(valueWhite === 'Critical') {
+                 return value = 'white';
+             } else {
+                 //If it's any other label, we color it 'black'
+                 return value = '#000';
+             }
+         }
+          }
+        },
         responsive: true,
         maintainAspectRatio: false,
-        // maintainAspectRatio: true,
         legend: {
           display: true
-        }
+        },
       }
-    };
+    });
 
-    var chart_findings_by_group = document.getElementById("chart_findings_by_group").getContext("2d");
-    window.cfbc_stacked_bars= new Chart(chart_findings_by_group,cfbc_config_by_group);
+
 
     document.getElementById("chart_findings_by_group").onclick = function(evt){
 			var activePoints = cfbc_stacked_bars.getElementsAtEvent(evt);
