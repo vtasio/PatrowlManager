@@ -207,7 +207,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
             <thead>
               <tr>
                 <th>Grade</th>
-                <th>Value</th>
+                <th>Name</th>
                 <th>Score</th>
               </tr>
             </thead>
@@ -215,7 +215,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
               {% for asset in top_critical_assets %}
               <tr class='dblclickable-row' data-href='/assets/details/{{asset.id}}'>
                 <td><span class="badge badge-risk-grade-{{asset.risk_level|keyvalue:'grade'}}">{{asset.risk_level|keyvalue:"grade"}}</span></td>
-                <td>{{asset.value|truncatechars:25}}</td>
+                <td>{{asset.name|truncatechars:25}}</td>
                 <td>{{asset|risk_score}}</td>
               </tr>
               {% endfor %}
@@ -285,8 +285,8 @@ td.bg-grade-F-high {background-color: black; color: white;}
   <!-- End 2nd row -->
   <!-- 3rd row -->
   <div class="row equal">
-    <div class="tile col-sm-15">
-      <div class="tile-content">
+    <div class="tile col-sm-25">
+      <!-- <div class="tile-content">
         <div class="tile-header with-border">
           <h4>Asset group grades</h4>
         </div>
@@ -315,13 +315,16 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div>
-    <div class="tile col-sm-15">
+    <div class="tile col-sm-15"> -->
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Most critical asset groups</h4>
+          <h4>Findings by criticality and Type</h4>
         </div>
         <div class="tile-body">
-          <table class="table table-hover table-tile">
+          <div>
+            <canvas id="chart-findings-by-criticity-and-type"  height="250"/>
+          </div>
+          <!-- <table class="table table-hover table-tile">
             <thead>
               <tr>
                 <th>Grade</th>
@@ -338,7 +341,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
               </tr>
               {% endfor %}
             </tbody>
-          </table>
+          </table> -->
         </div>
       </div>
     </div>
@@ -575,6 +578,7 @@ const totalizer = {
   var chart_findings_by_criticities;
 
   cfbc_config = {
+    plugins: [totalizer],
       type: 'bar',
       data: {
           datasets: [{
@@ -597,24 +601,29 @@ const totalizer = {
         legend: {
           display: false
         },
-        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 50,suggestedMax: +60}}],xAxes: [{barPercentage: 0.4}]},
-        animation: {
-        duration: 20,
-        onComplete: function () {
-            var chartInstance = this.chart,
-                ctx = chartInstance.ctx;
-            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
+        scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 50,suggestedMax: +60}}],xAxes: [{barPercentage: 0.6}]},
+    plugins: {
+      datalabels: {
+        align: function(context) {
+         var chart = context.chart;
+         var area = chart.chartArea;
+         var meta = chart.getDatasetMeta(context.datasetIndex);
 
-            this.data.datasets.forEach(function (dataset, i) {
-                var meta = chartInstance.controller.getDatasetMeta(i);
-                meta.data.forEach(function (bar, index) {
-                    var data = dataset.data[index];
-                    ctx.fillText(data, bar._model.x, bar._model.y - 5);
-                });
-            });
-        }
+         // WARNING: meta.data._model is PRIVATE and thus can 
+         // change without notice, breaking code relying on it!
+         var model = meta.data[context.dataIndex]._model;
+         var bottom = Math.min(model.base, area.bottom);
+         var height = bottom - model.y;
+         return height < 25 ? 'end' : 'start'
+       },
+       anchor: 'end',
+       offset: 4,
+        padding: 0,
+        font: {
+          weight: 600,
+        },
+        color: "black",
+      }
     }
       }
     };
@@ -746,6 +755,105 @@ const totalizer = {
         window.location = '/assets/groups/details/'+chart_findings_by_group_id[label];
 		};
 
+    var chart_findings_by_type = [];
+    var chart_findings_by_type_critical = [];
+    var chart_findings_by_type_high = [];
+    var chart_findings_by_type_medium = [];
+    var chart_findings_by_type_low = [];
+    var chart_findings_by_type_info = [];
+    var chart_findings_by_type_false_positive = [];
+    var chart_findings_by_type_duplicate = [];
+    {% for t in findings_per_type_list %}
+          {% if t.nb_critical > 0 or t.nb_high > 0 or t.nb_medium > 0 or t.nb_low > 0 %}
+              {% if forloop.counter0 < 35 %}
+                chart_findings_by_type.push("{{ t.name }}");
+                chart_findings_by_type_critical.push("{{ t.nb_critical }}");
+                chart_findings_by_type_high.push("{{ t.nb_high }}");
+                chart_findings_by_type_medium.push("{{ t.nb_medium }}");
+                chart_findings_by_type_low.push("{{ t.nb_low }}");
+                chart_findings_by_type_info.push("{{ t.nb_info }}");
+                chart_findings_by_type_false_positive.push("{{ t.nb_false_positive }}");
+                chart_findings_by_type_duplicate.push("{{ t.nb_duplicate }}");
+              {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    new Chart("chart-findings-by-criticity-and-type",{
+      type: 'horizontalBar',
+      plugins: [totalizer],
+      data: {
+          labels: chart_findings_by_type,
+          datasets: [
+            {label: 'Critical', data: chart_findings_by_type_critical, backgroundColor: '#cc0500'},
+            {label: 'High', data: chart_findings_by_type_high, backgroundColor: '#f9a009'},
+            {label: 'Medium', data: chart_findings_by_type_medium, backgroundColor: '#ffcb0d'},
+            {label: 'Low', data: chart_findings_by_type_low, backgroundColor: '#74b72e'},
+            //{label: 'Info', data: chart_findings_by_group_info, backgroundColor: '#ffcb0d'},
+            //{label: 'False Positive', data: chart_findings_by_group_false_positive, backgroundColor: '#ffcb0d'},
+            //{label: 'Duplicate', data: chart_findings_by_group_duplicate, backgroundColor: '#ffcb0d'},
+          ]
+      },
+      options: {
+        scales: {
+            xAxes: [{
+                stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                  stepSize: 30,
+                  suggestedMax: +20,
+                  minBarLength: 20
+                }
+            }],
+            yAxes: [{
+                stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                  stepSize: 30,
+                  suggestedMax: +20,
+                  minBarLength: 20
+                }
+            }]
+        },
+        plugins: {
+          datalabels: {
+            display: function(ctx) {
+              return ctx.dataset.data[ctx.dataIndex] > 0; // or >= 1 or ...
+            },
+            formatter: (value, ctx) => {
+              const total = ctx.chart.$totalizer.totals[ctx.dataIndex][ctx.datasetIndex]
+            },
+            labels: {
+              title: {
+                font: {
+                  weight: 'bold'
+                }
+              }
+            },
+            color: function(ctx) {
+             var index = ctx.dataIndex;
+             var value = ctx.dataset.data[index];
+             //Inside the "dataset" we look for the "labels" we are using
+             //and store them in a variable
+             var valueWhite = ctx.dataset.label;
+             //We make the condition: if a value of the label is "Strong blue"
+             //then we color this label 'white'
+             if(valueWhite === 'Critical') {
+                 return value = 'white';
+             } else {
+                 //If it's any other label, we color it 'black'
+                 return value = '#000';
+             }
+         }
+          }
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          display: true
+        },
+      }
+    });
+
 var chart_findings_by_service_tag = [];
 var chart_findings_by_service_tag_critical = [];
 var chart_findings_by_service_tag_high = [];
@@ -760,7 +868,7 @@ var chart_findings_by_service_tag_id = {};
   {% if group.nb_critical > 0 or group.nb_high > 0 or group.nb_medium > 0 or group.nb_low > 0 %}
     {% if forloop.counter0 < 5 %}
 
-        chart_findings_by_service_tag.push("{{ group.name }}");
+        chart_findings_by_service_tag.push("{{ group.name }}".replace('ServiceTag: ',''));
         chart_findings_by_service_tag_id["{{ group.name }}"]={{ group.id }};
         chart_findings_by_service_tag_critical.push("{{ group.nb_critical }}");
         chart_findings_by_service_tag_high.push("{{ group.nb_high }}");
@@ -778,6 +886,7 @@ var chart_findings_by_service_tag_id = {};
 
   cfbc_config_by_service_tag = {
       type: 'horizontalBar',
+      plugins: [totalizer],
       data: {
           labels: chart_findings_by_service_tag,
           datasets: [
@@ -791,56 +900,63 @@ var chart_findings_by_service_tag_id = {};
           ]
       },
       options: {
-        plugins: {
-          datalabels: {
-            display: true,
-            align: 'center',
-            anchor: 'center'
-            }
-        },
         scales: {
             xAxes: [{
-                //stacked: true,
+                stacked: true,
                 ticks: {
                   beginAtZero: true,
                   stepSize: 30,
-                  suggestedMax: +20
+                  suggestedMax: +20,
+                  minBarLength: 20
                 }
             }],
             yAxes: [{
-                //stacked: true,
+                stacked: true,
                 ticks: {
                   beginAtZero: true,
                   stepSize: 30,
-                  suggestedMax: +20
+                  suggestedMax: +20,
+                  minBarLength: 20
                 }
             }]
         },
-        animation: {
-        duration: 20,
-        onComplete: function () {
-            var chartInstance = this.chart,
-                ctx = chartInstance.ctx;
-            ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-
-            this.data.datasets.forEach(function (dataset, i) {
-                var meta = chartInstance.controller.getDatasetMeta(i);
-                meta.data.forEach(function (bar, index) {
-                    var data = dataset.data[index];
-                    ctx.fillText(data, bar._model.x + 10, bar._model.y + 8);
-                });
-            });
-        }
-    },
-        //responsive: false,
+        plugins: {
+          datalabels: {
+            display: function(ctx) {
+              return ctx.dataset.data[ctx.dataIndex] > 0; // or >= 1 or ...
+            },
+            formatter: (value, ctx) => {
+              const total = ctx.chart.$totalizer.totals[ctx.dataIndex][ctx.datasetIndex]
+            },
+            labels: {
+              title: {
+                font: {
+                  weight: 'bold'
+                }
+              }
+            },
+            color: function(ctx) {
+             var index = ctx.dataIndex;
+             var value = ctx.dataset.data[index];
+             //Inside the "dataset" we look for the "labels" we are using
+             //and store them in a variable
+             var valueWhite = ctx.dataset.label;
+             //We make the condition: if a value of the label is "Strong blue"
+             //then we color this label 'white'
+             if(valueWhite === 'Critical') {
+                 return value = 'white';
+             } else {
+                 //If it's any other label, we color it 'black'
+                 return value = '#000';
+             }
+         }
+          }
+        },
         responsive: true,
         maintainAspectRatio: false,
-        // maintainAspectRatio: true,
         legend: {
           display: true
-        }
+        },
       }
     };
 
@@ -855,10 +971,11 @@ var chart_findings_by_service_tag_id = {};
 			if (firstPoint !== undefined)
         window.location = '/assets/groups/details/'+chart_findings_by_service_tag_id[label];
 		};
-
+//SSL Findings chart
     var chart_ssllabs_findings;
 
 ssl_config = {
+  plugins: [totalizer],
     type: 'bar',
     data: {
         datasets: [{
@@ -870,12 +987,12 @@ ssl_config = {
                 "#f4d03f",
                 "#d35400",
                 "#cb4335",
+                "#cb4335",
                 "#cb4335"
             ]
         }],
-        labels: ["A","A+","B", "C", "D","F", "G", "T"]
+        labels: ["A","A+","B", "C", "D","E", "F", "G", "T"]
     },
-
     options: {
       //responsive: false,
       responsive: true,
@@ -884,25 +1001,50 @@ ssl_config = {
       legend: {
         display: false
       },
-      scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 20,suggestedMax: +20}}],xAxes: [{barPercentage: 0.4}]},
-      animation: {
-      duration: 20,
-      onComplete: function () {
-          var chartInstance = this.chart,
-              ctx = chartInstance.ctx;
-          ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
+      scales:{yAxes:[{ticks:{beginAtZero: true,stepSize: 20,suggestedMax: +20}}],xAxes: [{barPercentage: 0.7}]},
+      plugins: {
+      datalabels: {
+        align: function(context) {
+         var chart = context.chart;
+         var area = chart.chartArea;
+         var meta = chart.getDatasetMeta(context.datasetIndex);
 
-          this.data.datasets.forEach(function (dataset, i) {
-              var meta = chartInstance.controller.getDatasetMeta(i);
-              meta.data.forEach(function (bar, index) {
-                  var data = dataset.data[index];
-                  ctx.fillText(data, bar._model.x, bar._model.y - 5);
-              });
-          });
+         // WARNING: meta.data._model is PRIVATE and thus can 
+         // change without notice, breaking code relying on it!
+         var model = meta.data[context.dataIndex]._model;
+         var bottom = Math.min(model.base, area.bottom);
+         var height = bottom - model.y;
+         return height < 25 ? 'end' : 'start'
+       },
+       anchor: 'end',
+       offset: 4,
+        padding: 0,
+        font: {
+          weight: 600,
+        },
+        color: function(context) {
+             var index = context.dataIndex;
+             var value = context.dataset.data[index];
+             //Inside the "dataset" we look for the "labels" we are using
+             //and store them in a variable
+             var valueWhite = context.dataset.backgroundColor[index];
+             //We make the condition: if a value of the label is "Strong blue"
+             //then we color this label 'white'
+             if(valueWhite === '#186a3b') {
+                 return value = 'white';
+             } 
+             else if(valueWhite === '#1d8348') {
+                 return value = 'white';
+             }
+             else {
+                 //If it's any other label, we color it 'black'
+                 return value = '#000';
+             }
+        }
       }
-  }
+    }
+        
+  
     }
   };
 
