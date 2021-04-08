@@ -18,6 +18,7 @@ import datetime
 import operator
 import copy
 import ast
+import pandas as pd
 
 
 @login_required
@@ -95,11 +96,11 @@ def homepage_dashboard_view(request):
     # finding counters
     findings_stats = findings.aggregate(
         nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
-        nb_critical=Coalesce(Sum(Case(When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
-        nb_high=Coalesce(Sum(Case(When(severity='high', then=1)), output_field=models.IntegerField()), 0),
-        nb_medium=Coalesce(Sum(Case(When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
-        nb_low=Coalesce(Sum(Case(When(severity='low', then=1)), output_field=models.IntegerField()), 0),
-        nb_info=Coalesce(Sum(Case(When(severity='info', then=1)), output_field=models.IntegerField()), 0),
+        nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
+        nb_high=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='high', then=1)), output_field=models.IntegerField()), 0),
+        nb_medium=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
+        nb_low=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='low', then=1)), output_field=models.IntegerField()), 0),
+        nb_info=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='info', then=1)), output_field=models.IntegerField()), 0),
         nb_false_positive=Coalesce(Sum(Case(When(status='falsepositive', then=1)), output_field=models.IntegerField()), 0),
         nb_duplicate=Coalesce(Sum(Case(When(status='duplicate', then=1)), output_field=models.IntegerField()), 0),
     )
@@ -205,6 +206,78 @@ def homepage_dashboard_view(request):
         assetgroups_findings_stats_list.append(assetgroups_findings_stats)
 
     assetgroups_findings_stats_list = sorted(assetgroups_findings_stats_list, key = lambda i: (i['nb_critical'], i['nb_high'], i['nb_medium'], i['nb_low']), reverse=True)
+
+    # All Findings per Type
+    findings_per_type_list = []
+    findings_per_type = {}
+    type_list = list(findings.values('type').distinct())
+    for t in type_list:
+        findings_per_type = findings.exclude(Q(title__icontains="SSL") | Q(title__icontains="TLS")| Q(title__icontains="certificate")).filter(type=t['type']).aggregate(
+            nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
+            nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
+            nb_high=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='high', then=1)), output_field=models.IntegerField()), 0),
+            nb_medium=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
+            nb_low=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='low', then=1)), output_field=models.IntegerField()), 0),
+            nb_info=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='info', then=1)), output_field=models.IntegerField()), 0),
+            nb_false_positive=Coalesce(Sum(Case(When(status='falsepositive', then=1)), output_field=models.IntegerField()), 0),
+            nb_duplicate=Coalesce(Sum(Case(When(status='duplicate', then=1)), output_field=models.IntegerField()), 0),
+        )
+        if 'cgi_abuses' in t['type']:
+            findings_per_type['name'] = "Web Vulnerabilities"
+        elif "cgi_abuses_:_xss" in t['type']:
+            findings_per_type['name'] = "Web Vulnerabilities"
+        elif "tls_ssllabs_grade" in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'tls_supported_protocols' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'tls_accepted_ciphersuites' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif "ssltest_scan_summary" in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif "ssltest_supported_ciphersuites" in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'tls_access' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif "ssltest_heartbleed" in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'ssltest_certificate_expired' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'ssltest_certificate_selfsigned' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'tls_certificate_keysize' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        elif 'tls_certificate_validity' in t['type']:
+            findings_per_type['name'] = "SSL Vulnerabilities"
+        else:
+            findings_per_type['name'] = t['type']
+        findings_per_type_list.append(findings_per_type)
+    findings_per_type = findings.filter(Q(title__icontains="SSL") | Q(title__icontains="TLS")| Q(title__icontains="certificate")).aggregate(
+            nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
+            nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
+            nb_high=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='high', then=1)), output_field=models.IntegerField()), 0),
+            nb_medium=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
+            nb_low=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='low', then=1)), output_field=models.IntegerField()), 0),
+            nb_info=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='info', then=1)), output_field=models.IntegerField()), 0),
+            nb_false_positive=Coalesce(Sum(Case(When(status='falsepositive', then=1)), output_field=models.IntegerField()), 0),
+            nb_duplicate=Coalesce(Sum(Case(When(status='duplicate', then=1)), output_field=models.IntegerField()), 0),
+        )
+    findings_per_type['name'] = "SSL Vulnerabilities"
+    findings_per_type_list.append(findings_per_type)
+    findings_per_type = findings.exclude(Q(title__icontains="SSL") | Q(title__icontains="TLS")| Q(title__icontains="certificate")).filter(type='').aggregate(
+            nb_new=Coalesce(Sum(Case(When(status='new', then=1)), output_field=models.IntegerField()), 0),
+            nb_critical=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='critical', then=1)), output_field=models.IntegerField()), 0),
+            nb_high=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='high', then=1)), output_field=models.IntegerField()), 0),
+            nb_medium=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='medium', then=1)), output_field=models.IntegerField()), 0),
+            nb_low=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='low', then=1)), output_field=models.IntegerField()), 0),
+            nb_info=Coalesce(Sum(Case(When(status='duplicate', then=0), When(status='falsepositive', then=0),When(severity='info', then=1)), output_field=models.IntegerField()), 0),
+            nb_false_positive=Coalesce(Sum(Case(When(status='falsepositive', then=1)), output_field=models.IntegerField()), 0),
+            nb_duplicate=Coalesce(Sum(Case(When(status='duplicate', then=1)), output_field=models.IntegerField()), 0),
+        )
+    findings_per_type['name'] = "Generic Vulnerabilities"
+    findings_per_type_list.append(findings_per_type)
+
+    findings_per_type_list = (pd.DataFrame(findings_per_type_list).groupby(['name'], as_index=False)['nb_new','nb_critical','nb_high','nb_medium','nb_low','nb_info','nb_false_positive','nb_duplicate'].sum().to_dict('r'))
+    findings_per_type_list = sorted(findings_per_type_list, key = lambda i: (i['nb_critical'], i['nb_high'], i['nb_medium'], i['nb_low']), reverse=True)
 
     # Findings per Service groups
     servicegroups_findings_stats_list = []
@@ -350,6 +423,7 @@ def homepage_dashboard_view(request):
         'teams': teams,
         'ssllabs_stats':ssllabs_stats,
         "servicegroups_findings_stats_list":servicegroups_findings_stats_list,
+        'findings_per_type_list':findings_per_type_list,
     })
 
 
