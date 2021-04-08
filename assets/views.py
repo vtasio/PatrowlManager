@@ -418,7 +418,13 @@ def bulkadd_asset_view(request):
                     if Asset.objects.for_user(request.user).filter(value=line['asset_value']).count() > 0:
                         asset = Asset.objects.for_user(request.user).filter(value=line['asset_value']).first()
                         # continue
-                        messages.warning(request, "Asset '{}' already created. Updates are not applied.".format(asset))
+                        messages.warning(request, "Asset '{}' already created. Updates are applied.".format(asset))
+                        asset_criticity = 'low'
+                        if 'asset_criticality' in line.keys() and str(line['asset_criticality']).lower() in ['low', 'medium', 'high']:
+                            asset.criticity = str(line['asset_criticality']).lower()
+                        if 'asset_criticity' in line.keys() and str(line['asset_criticity']).lower() in ['low', 'medium', 'high']:
+                            asset.criticity = str(line['asset_criticity']).lower()
+                        asset.name = line['asset_name']
                     else:
                         # Set default criticity/criticality
                         asset_criticity = 'low'
