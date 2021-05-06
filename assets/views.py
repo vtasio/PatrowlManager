@@ -695,6 +695,29 @@ def detail_asset_group_view(request, assetgroup_id):
         # 'year_ago': asset_group.get_risk_grade(history = 365)
     }
 
+    # List asset groups
+    asset_groups = []
+    ags = AssetGroup.objects.for_user(request.user).all().annotate(
+            asset_list=ArrayAgg('assets__value')
+        ).only(
+            "id", "name", "assets", "criticity", "updated_at", "risk_level", "teams"
+        )
+
+    for asset_group in ags.order_by(Lower("name")):
+        assets_names = ""
+        if asset_group.asset_list != [None]:
+            assets_names = ", ".join(asset_group.asset_list)
+        ag = {
+            "id": asset_group.id,
+            "name": asset_group.name,
+            "criticity": asset_group.criticity,
+            "updated_at": asset_group.updated_at,
+            "assets_names": assets_names,
+            "risk_grade": asset_group.risk_level['grade'],
+            "teams": asset_group.teams
+        }
+        asset_groups.append(ag)
+
     # Paginations
     # Pagination assets
     nb_rows = int(request.GET.get('n_assets', 25))
@@ -728,7 +751,8 @@ def detail_asset_group_view(request, assetgroup_id):
         'scans': scans,
         'scan_defs': scan_defs,
         'engines_stats': engines_stats,
-        'asset_scopes': list(asset_scopes.items())
+        'asset_scopes': list(asset_scopes.items()),
+        'asset_groups':asset_groups
     })
 
 
