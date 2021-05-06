@@ -13,6 +13,7 @@ from common.utils.encoding import json_serial
 import os
 import json
 import inspect
+# import uuid
 
 SCAN_STATUS = ('created', 'enqueued', 'started', 'finished', 'error', 'trashed')
 

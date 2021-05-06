@@ -286,11 +286,11 @@ class Asset(models.Model):
             "total": 0, "grade": "-"}
 
         if not history:
-            findings = self.finding_set.all().values("severity","status")
+            findings = self.finding_set.all().values("severity", "status")
         else:
             startdate = datetime.datetime.today()
             enddate = startdate - datetime.timedelta(days=history)
-            findings = self.finding_set.filter(created_at__lte=enddate).values("severity","status")
+            findings = self.finding_set.filter(created_at__lte=enddate).values("severity", "status")
 
         for finding in findings:
             if finding['status'] not in ["falsepositive","duplicate"]:

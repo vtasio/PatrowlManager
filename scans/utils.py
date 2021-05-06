@@ -97,9 +97,7 @@ def _run_scan(scan_def_id, owner_id, eta=None):
             scan.assets.add(a)
             assets_list.append({
                 "id": a.id,
-                "value": a.value.strip(),
-                "criticity": a.criticity,
-                "datatype": a.type
+                "value": a.value.strip()
             })
 
     parameters = {

@@ -144,6 +144,7 @@ def detail_scan_view(request, scan_id):
                 f.severity: summary_taggroups[ag.id][f.severity] + 1,
                 "total": summary_taggroups[ag.id]["total"] + 1
             })
+
     # Generate findings stats
     month_ago = datetime.today()-timedelta(days=30)
     findings_stats = {

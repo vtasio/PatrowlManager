@@ -268,7 +268,7 @@ def add_asset_view(request):
                 asset_group.save()
 
             messages.success(request, 'New asset created')
-            return redirect('list_assets_view')
+            return redirect('detail_asset_view', asset_id=asset.id)
 
     return render(request, 'add-asset.html', {'form': form})
 
@@ -310,7 +310,7 @@ def edit_asset_view(request, asset_id):
             asset.save()
 
             messages.success(request, 'Update submission successful')
-            return redirect('list_assets_view')
+            return redirect('detail_asset_view', asset_id=asset_id)
 
     return render(request, 'edit-asset.html', {'form': form, 'asset': asset})
 
@@ -321,6 +321,7 @@ def add_asset_group_view(request):
 
     if request.method == 'GET':
         form = AssetGroupForm(user=request.user)
+        teams_list = request.user.users_team.values('id', 'name').order_by('name')
     elif request.method == 'POST':
         form = AssetGroupForm(request.POST, user=request.user)
         if form.is_valid():
@@ -352,8 +353,8 @@ def add_asset_group_view(request):
             asset_group.save()
             messages.success(request, 'Creation submission successful')
 
-            return redirect('list_assets_view')
-    return render(request, 'add-asset-group.html', {'form': form})
+            return redirect('detail_asset_group_view', assetgroup_id=asset_group.id)
+    return render(request, 'add-asset-group.html', {'form': form, 'teams_list': teams_list})
 
 
 @pro_group_required('AssetsManager')
@@ -389,7 +390,7 @@ def edit_asset_group_view(request, assetgroup_id):
             asset_group.save()
 
             messages.success(request, 'Update submission successful')
-            return redirect('list_assets_view')
+            return redirect('detail_asset_group_view', assetgroup_id=assetgroup_id)
 
     return render(request, 'edit-asset-group.html', {
         'form': form,
@@ -714,6 +715,29 @@ def detail_asset_group_view(request, assetgroup_id):
         # 'year_ago': asset_group.get_risk_grade(history = 365)
     }
 
+    # List asset groups
+    asset_groups = []
+    ags = AssetGroup.objects.for_user(request.user).all().annotate(
+            asset_list=ArrayAgg('assets__value')
+        ).only(
+            "id", "name", "assets", "criticity", "updated_at", "risk_level", "teams"
+        )
+
+    for asset_group in ags.order_by(Lower("name")):
+        assets_names = ""
+        if asset_group.asset_list != [None]:
+            assets_names = ", ".join(asset_group.asset_list)
+        ag = {
+            "id": asset_group.id,
+            "name": asset_group.name,
+            "criticity": asset_group.criticity,
+            "updated_at": asset_group.updated_at,
+            "assets_names": assets_names,
+            "risk_grade": asset_group.risk_level['grade'],
+            "teams": asset_group.teams
+        }
+        asset_groups.append(ag)
+
     # Paginations
     # Pagination assets
     nb_rows = int(request.GET.get('n_assets', 25))
@@ -747,7 +771,8 @@ def detail_asset_group_view(request, assetgroup_id):
         'scans': scans,
         'scan_defs': scan_defs,
         'engines_stats': engines_stats,
-        'asset_scopes': list(asset_scopes.items())
+        'asset_scopes': list(asset_scopes.items()),
+        'asset_groups':asset_groups
     })
 
 
