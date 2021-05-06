@@ -167,63 +167,63 @@ td.bg-grade-F-high {background-color: black; color: white;}
   <!-- End 1st row -->
   <!-- 2nd row -->
   <div class="row equal">
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Asset grades</h4>
-        </div>
-        <div class="tile-body">
-          <table style="text-align: center; font-size: small;">
-            <tr>
-              <th rowspan="2" style="text-align: center;">Grade</th>
-              <th colspan="3" style="text-align: center;">Criticality</th>
-            </tr>
-            <tr>
-              <th style="text-align: center; font-weight: lighter;">Low</th>
-              <th style="text-align: center; font-weight: lighter;">Medium</th>
-              <th style="text-align: center; font-weight: lighter;">High</th>
-            </tr>
-            {% for grades in asset_grades_map %}
-             {% for grade, value in grades.items %}
-           <tr>
-             <td>{{ grade }}</td>
-             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-low" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:low%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"low" }}</td>
-             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-medium" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:medium%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"medium" }}</td>
-             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-high" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:high%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"high" }}</td>
-           </tr>
-             {% endfor %}
-           {% endfor %}
-          </table>
-        </div>
-      </div>
-    </div>
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Most critical assets</h4>
-        </div>
-        <div class="tile-body">
-          <table class="table table-hover table-tile">
-            <thead>
-              <tr>
-                <th>Grade</th>
-                <th>Name</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for asset in top_critical_assets %}
-              <tr class='dblclickable-row' data-href='/assets/details/{{asset.id}}'>
-                <td><span class="badge badge-risk-grade-{{asset.risk_level|keyvalue:'grade'}}">{{asset.risk_level|keyvalue:"grade"}}</span></td>
-                <td>{{asset.name|truncatechars:25}}</td>
-                <td>{{asset|risk_score}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+{#    <div class="tile col-sm-15">#}
+{#      <div class="tile-content">#}
+{#        <div class="tile-header with-border">#}
+{#          <h4>Asset grades</h4>#}
+{#        </div>#}
+{#        <div class="tile-body">#}
+{#          <table style="text-align: center; font-size: small;">#}
+{#            <tr>#}
+{#              <th rowspan="2" style="text-align: center;">Grade</th>#}
+{#              <th colspan="3" style="text-align: center;">Criticality</th>#}
+{#            </tr>#}
+{#            <tr>#}
+{#              <th style="text-align: center; font-weight: lighter;">Low</th>#}
+{#              <th style="text-align: center; font-weight: lighter;">Medium</th>#}
+{#              <th style="text-align: center; font-weight: lighter;">High</th>#}
+{#            </tr>#}
+{#            {% for grades in asset_grades_map %}#}
+{#             {% for grade, value in grades.items %}#}
+{#           <tr>#}
+{#             <td>{{ grade }}</td>#}
+{#             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-low" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:low%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"low" }}</td>#}
+{#             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-medium" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:medium%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"medium" }}</td>#}
+{#             <td style="width: 20%; cursor: pointer;" class="bg-grade-{{grade}}-high" onclick="window.location='{% url 'list_assets_view' %}?filter=criticity:high%20score:{{grade}}'">{{ grades|keyvalue:grade|keyvalue:"high" }}</td>#}
+{#           </tr>#}
+{#             {% endfor %}#}
+{#           {% endfor %}#}
+{#          </table>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#    <div class="tile col-sm-15">#}
+{#      <div class="tile-content">#}
+{#        <div class="tile-header with-border">#}
+{#          <h4>Most critical assets</h4>#}
+{#        </div>#}
+{#        <div class="tile-body">#}
+{#          <table class="table table-hover table-tile">#}
+{#            <thead>#}
+{#              <tr>#}
+{#                <th>Grade</th>#}
+{#                <th>Name</th>#}
+{#                <th>Score</th>#}
+{#              </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#              {% for asset in top_critical_assets %}#}
+{#              <tr class='dblclickable-row' data-href='/assets/details/{{asset.id}}'>#}
+{#                <td><span class="badge badge-risk-grade-{{asset.risk_level|keyvalue:'grade'}}">{{asset.risk_level|keyvalue:"grade"}}</span></td>#}
+{#                <td>{{asset.name|truncatechars:25}}</td>#}
+{#                <td>{{asset|risk_score}}</td>#}
+{#              </tr>#}
+{#              {% endfor %}#}
+{#            </tbody>#}
+{#          </table>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
     <div class="tile col-sm-15">
       <div class="tile-content">
         <div class="tile-header with-border">
@@ -236,10 +236,22 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div>
-    <div class="tile col-sm-25">
+  <div class="tile col-sm-15">
       <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Top five Groups Per Technical Owner</h4>
+          <h4>SSL Grading</h4>
+        </div>
+        <div class="tile-body">
+          <div id="ssllabs-findings">
+            <canvas id="chart-ssllabs-findings"  height="250"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tile col-sm-35">
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Vulnerabilities per Technical Owner (Top five)</h4>
         </div>
         <div class="tile-body">
         <div id="chart-findings-by-group">
@@ -285,79 +297,44 @@ td.bg-grade-F-high {background-color: black; color: white;}
   <!-- End 2nd row -->
   <!-- 3rd row -->
   <div class="row equal">
-    <div class="tile col-sm-25">
-      <!-- <div class="tile-content">
+<div class="tile col-sm-25">
+      <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Asset group grades</h4>
+          <h4>Most critical findings</h4>
         </div>
         <div class="tile-body">
-          <table style="text-align: center; font-size: small;">
-            <tr>
-              <th rowspan="2" style="text-align: center;">Grade</th>
-              <th colspan="3" style="text-align: center;">Criticality</th>
-            </tr>
-            <tr>
-              <th style="text-align: center; font-weight: lighter;">Low</th>
-              <th style="text-align: center; font-weight: lighter;">Medium</th>
-              <th style="text-align: center; font-weight: lighter;">High</th>
-            </tr>
-            {% for grades in assetgroup_grades_map %}
-             {% for grade, value in grades.items %}
-           <tr>
-             <td>{{ grade }}</td>
-             <td style="width: 20%;" class="bg-grade-{{grade}}-low">{{ grades|keyvalue:grade|keyvalue:"low" }}</td>
-             <td style="width: 20%;" class="bg-grade-{{grade}}-medium">{{ grades|keyvalue:grade|keyvalue:"medium" }}</td>
-             <td style="width: 20%;" class="bg-grade-{{grade}}-high">{{ grades|keyvalue:grade|keyvalue:"high" }}</td>
-           </tr>
-             {% endfor %}
-           {% endfor %}
+          <table class="table table-hover table-tile">
+            <thead>
+              <tr>
+                <th>Severity</th>
+                <th>Title</th>
+                <th>Asset</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for finding in top_critical_findings %}
+              <tr class='dblclickable-row' data-href='/findings/details/{{finding.id}}'>
+                {% if finding.severity == 'critical' %}
+                <td><span class="label label-critical">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'high' %}
+                <td><span class="label label-high">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'medium' or finding.severity == 'moderate' %}
+                <td><span class="label label-medium">{{ finding.severity }}</span></td>
+                {% elif finding.severity == 'low' %}
+                <td><span class="label label-low">{{ finding.severity }}</span></td>
+                {% else %}
+                <td><span class="label label-info">{{ finding.severity }}</span></td>
+                {% endif %}
+                <td>{{finding.title|truncatechars:40}}</td>
+                <td>{{finding.asset_name|truncatechars:30}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
           </table>
         </div>
       </div>
     </div>
-    <div class="tile col-sm-15"> -->
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>Findings by criticality and Type</h4>
-        </div>
-        <div class="tile-body">
-          <div>
-            <canvas id="chart-findings-by-criticity-and-type"  height="250"/>
-          </div>
-          <!-- <table class="table table-hover table-tile">
-            <thead>
-              <tr>
-                <th>Grade</th>
-                <th>Name</th>
-                <th>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for assetgroup in top_critical_assetgroups %}
-              <tr class='dblclickable-row' data-href='/assets/groups/details/{{assetgroup.id}}'>
-                <td><span class="badge badge-risk-grade-{{assetgroup.risk_level|keyvalue:'grade'}}">{{assetgroup.risk_level|keyvalue:"grade"}}</span></td>
-                <td>{{assetgroup.name}}</td>
-                <td>{{assetgroup|risk_score}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table> -->
-        </div>
-      </div>
-    </div>
-    <div class="tile col-sm-15">
-      <div class="tile-content">
-        <div class="tile-header with-border">
-          <h4>SSL Grading</h4>
-        </div>
-        <div class="tile-body">
-          <div id="ssllabs-findings">
-            <canvas id="chart-ssllabs-findings"  height="250"/>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="tile col-sm-25">
+    <div class="tile col-sm-35">
       <div class="tile-content">
         <div class="tile-header with-border">
           <h4>Vulnerabilities per asset (top-5)</h4>
@@ -445,7 +422,7 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div> -->
-    <div class="tile col-sm-35">
+    <div class="tile col-sm-25">
       <div class="tile-content">
         <div class="tile-header with-border">
           <h4>Last scans</h4>
@@ -511,44 +488,67 @@ td.bg-grade-F-high {background-color: black; color: white;}
         </div>
       </div>
     </div>
-
-    <div class="tile col-sm-25">
-      <div class="tile-content">
+    <div class="tile col-sm-35">
+      <!-- <div class="tile-content">
         <div class="tile-header with-border">
-          <h4>Most critical findings</h4>
+          <h4>Asset group grades</h4>
         </div>
         <div class="tile-body">
-          <table class="table table-hover table-tile">
-            <thead>
-              <tr>
-                <th>Severity</th>
-                <th>Title</th>
-                <th>Asset</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for finding in top_critical_findings %}
-              <tr class='dblclickable-row' data-href='/findings/details/{{finding.id}}'>
-                {% if finding.severity == 'critical' %}
-                <td><span class="label label-critical">{{ finding.severity }}</span></td>
-                {% elif finding.severity == 'high' %}
-                <td><span class="label label-high">{{ finding.severity }}</span></td>
-                {% elif finding.severity == 'medium' or finding.severity == 'moderate' %}
-                <td><span class="label label-medium">{{ finding.severity }}</span></td>
-                {% elif finding.severity == 'low' %}
-                <td><span class="label label-low">{{ finding.severity }}</span></td>
-                {% else %}
-                <td><span class="label label-info">{{ finding.severity }}</span></td>
-                {% endif %}
-                <td>{{finding.title|truncatechars:40}}</td>
-                <td>{{finding.asset_name|truncatechars:30}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
+          <table style="text-align: center; font-size: small;">
+            <tr>
+              <th rowspan="2" style="text-align: center;">Grade</th>
+              <th colspan="3" style="text-align: center;">Criticality</th>
+            </tr>
+            <tr>
+              <th style="text-align: center; font-weight: lighter;">Low</th>
+              <th style="text-align: center; font-weight: lighter;">Medium</th>
+              <th style="text-align: center; font-weight: lighter;">High</th>
+            </tr>
+            {% for grades in assetgroup_grades_map %}
+             {% for grade, value in grades.items %}
+           <tr>
+             <td>{{ grade }}</td>
+             <td style="width: 20%;" class="bg-grade-{{grade}}-low">{{ grades|keyvalue:grade|keyvalue:"low" }}</td>
+             <td style="width: 20%;" class="bg-grade-{{grade}}-medium">{{ grades|keyvalue:grade|keyvalue:"medium" }}</td>
+             <td style="width: 20%;" class="bg-grade-{{grade}}-high">{{ grades|keyvalue:grade|keyvalue:"high" }}</td>
+           </tr>
+             {% endfor %}
+           {% endfor %}
           </table>
         </div>
       </div>
     </div>
+    <div class="tile col-sm-15"> -->
+      <div class="tile-content">
+        <div class="tile-header with-border">
+          <h4>Findings by criticality and Type</h4>
+        </div>
+        <div class="tile-body">
+          <div>
+            <canvas id="chart-findings-by-criticity-and-type"  height="250"/>
+          </div>
+          <!-- <table class="table table-hover table-tile">
+            <thead>
+              <tr>
+                <th>Grade</th>
+                <th>Name</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assetgroup in top_critical_assetgroups %}
+              <tr class='dblclickable-row' data-href='/assets/groups/details/{{assetgroup.id}}'>
+                <td><span class="badge badge-risk-grade-{{assetgroup.risk_level|keyvalue:'grade'}}">{{assetgroup.risk_level|keyvalue:"grade"}}</span></td>
+                <td>{{assetgroup.name}}</td>
+                <td>{{assetgroup|risk_score}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table> -->
+        </div>
+      </div>
+    </div>
+
 
   </div>
   <!-- End 4th row -->
@@ -556,6 +556,8 @@ td.bg-grade-F-high {background-color: black; color: white;}
 </div> <!-- End container-fluid -->
 
 <script>
+
+Chart.plugins.register(ChartDataLabels);
 
 const totalizer = {
       id: 'totalizer',
@@ -638,6 +640,15 @@ const totalizer = {
 
     var ctx_findings = document.getElementById("chart-findings-by-criticities").getContext("2d");
     window.cfbc_pie_chart = new Chart(ctx_findings, cfbc_config);
+        document.getElementById("chart-findings-by-criticities").onclick = function(evt){
+			var activePoints = cfbc_pie_chart.getElementsAtEvent(evt);
+			var firstPoint = activePoints[0];
+			var label = cfbc_pie_chart.data.labels[firstPoint._index];
+			var value = cfbc_pie_chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+			if (firstPoint !== undefined){
+			    new_loc= 'findings/list?&_severity='+label.toLowerCase()+'&_severity_cond=exact&_status=none&_status_cond=exact&_owner=&_owner_cond=exact';
+        window.location = new_loc;}
+		};
 
     // Hide 'info' findings
     //window.cfbc_pie_chart.getDatasetMeta(0).data[4].hidden = true;
@@ -668,7 +679,7 @@ const totalizer = {
         {% endif %}
     {% endfor %}
 
-    new Chart("chart_findings_by_group",{
+    window.chart_findings_by_group = new Chart("chart_findings_by_group",{
       type: 'horizontalBar',
       plugins: [totalizer],
       data: {
@@ -744,13 +755,11 @@ const totalizer = {
       }
     });
 
-
-
     document.getElementById("chart_findings_by_group").onclick = function(evt){
-			var activePoints = cfbc_stacked_bars.getElementsAtEvent(evt);
+			var activePoints = chart_findings_by_group.getElementsAtEvent(evt);
 			var firstPoint = activePoints[0];
-			var label = cfbc_stacked_bars.data.labels[firstPoint._index];
-			var value = cfbc_stacked_bars.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+			var label = chart_findings_by_group.data.labels[firstPoint._index];
+			var value = chart_findings_by_group.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
 			if (firstPoint !== undefined)
         window.location = '/assets/groups/details/'+chart_findings_by_group_id[label];
 		};
@@ -961,15 +970,16 @@ var chart_findings_by_service_tag_id = {};
     };
 
     var chart_findings_by_service_tag = document.getElementById("chart_findings_by_service_tag").getContext("2d");
-    window.cfbc_stacked_bars= new Chart(chart_findings_by_service_tag,cfbc_config_by_service_tag);
+    window.chart_findings_by_service_tag= new Chart(chart_findings_by_service_tag,cfbc_config_by_service_tag);
 
     document.getElementById("chart_findings_by_service_tag").onclick = function(evt){
-			var activePoints = cfbc_stacked_bars.getElementsAtEvent(evt);
+			var activePoints = chart_findings_by_service_tag.getElementsAtEvent(evt);
 			var firstPoint = activePoints[0];
-			var label = cfbc_stacked_bars.data.labels[firstPoint._index];
-			var value = cfbc_stacked_bars.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-			if (firstPoint !== undefined)
-        window.location = '/assets/groups/details/'+chart_findings_by_service_tag_id[label];
+			var label = chart_findings_by_service_tag.data.labels[firstPoint._index];
+			var value = chart_findings_by_service_tag.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+			if (firstPoint !== undefined){
+			    new_loc= '/assets/groups/details/'+chart_findings_by_service_tag_id[label];
+        window.location = new_loc;}
 		};
 //SSL Findings chart
     var chart_ssllabs_findings;
@@ -991,7 +1001,7 @@ ssl_config = {
                 "#cb4335"
             ]
         }],
-        labels: ["A","A+","B", "C", "D","E", "F", "G", "T"]
+        labels: ["A+","A","B", "C", "D","E", "F", "G", "T"]
     },
     options: {
       //responsive: false,
@@ -1049,8 +1059,8 @@ ssl_config = {
   };
 
   ssl_config["data"]["datasets"][0]["data"] = new Array(
+      {{ssllabs_stats.nb_A_plus}},
     {{ssllabs_stats.nb_A}},
-    {{ssllabs_stats.nb_A_plus}},
     {{ssllabs_stats.nb_B}},
     {{ssllabs_stats.nb_C}},
     {{ssllabs_stats.nb_D}},
@@ -1063,6 +1073,23 @@ ssl_config = {
 
   var ssl_findings = document.getElementById("chart-ssllabs-findings").getContext("2d");
   window.ssl_pie_chart = new Chart(ssl_findings, ssl_config);
+
+      document.getElementById("chart-ssllabs-findings").onclick = function(evt) {
+          var activePoints = ssl_pie_chart.getElementsAtEvent(evt);
+          var firstPoint = activePoints[0];
+          var label = ssl_pie_chart.data.labels[firstPoint._index];
+          var value = ssl_pie_chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+          if (firstPoint !== undefined) {
+                if(firstPoint._index == 0) {
+                    window.location = "findings/list?&_title=A%2B (SSL-Labs Grade)&_title_cond=icontains&_severity=none&_severity_cond=exact&_status=none&_status_cond=exact&_owner=&_owner_cond=exact";
+                }
+              else if (firstPoint._index == 8) {
+                  window.location = "findings/list?&_title=SSL-Labs Grade ='T'&_title_cond=icontains&_severity=none&_severity_cond=exact&_status=none&_status_cond=exact&_owner=&_owner_cond=exact";
+              } else {
+                  window.location = "findings/list?&_title=" + label + " (SSL-Labs Grade)&_title_cond=icontains&_severity=none&_severity_cond=exact&_status=none&_status_cond=exact&_owner=&_owner_cond=exact";
+              }
+          };
+      };
 
 
     // jQuery
