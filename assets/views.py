@@ -716,27 +716,27 @@ def detail_asset_group_view(request, assetgroup_id):
     }
 
     # List asset groups
-    asset_groups = []
+    all_asset_groups = []
     ags = AssetGroup.objects.for_user(request.user).all().annotate(
             asset_list=ArrayAgg('assets__value')
         ).only(
             "id", "name", "assets", "criticity", "updated_at", "risk_level", "teams"
         )
 
-    for asset_group in ags.order_by(Lower("name")):
+    for assetgroup in ags.order_by(Lower("name")):
         assets_names = ""
-        if asset_group.asset_list != [None]:
-            assets_names = ", ".join(asset_group.asset_list)
+        if assetgroup.asset_list != [None]:
+            assets_names = ", ".join(assetgroup.asset_list)
         ag = {
-            "id": asset_group.id,
-            "name": asset_group.name,
-            "criticity": asset_group.criticity,
-            "updated_at": asset_group.updated_at,
+            "id": assetgroup.id,
+            "name": assetgroup.name,
+            "criticity": assetgroup.criticity,
+            "updated_at": assetgroup.updated_at,
             "assets_names": assets_names,
-            "risk_grade": asset_group.risk_level['grade'],
-            "teams": asset_group.teams
+            "risk_grade": assetgroup.risk_level['grade'],
+            "teams": assetgroup.teams
         }
-        asset_groups.append(ag)
+        all_asset_groups.append(ag)
 
     # Paginations
     # Pagination assets
@@ -772,7 +772,7 @@ def detail_asset_group_view(request, assetgroup_id):
         'scan_defs': scan_defs,
         'engines_stats': engines_stats,
         'asset_scopes': list(asset_scopes.items()),
-        'asset_groups':asset_groups
+        'all_asset_groups': all_asset_groups
     })
 
 

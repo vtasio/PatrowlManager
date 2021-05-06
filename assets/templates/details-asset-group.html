@@ -936,7 +936,7 @@ div.risk-trends {
               <dt>Groups:</dt>
               <dd>
                 <select id="update-asset-group" class="form-control form-control-xs" style="width:auto; display:inline-block; padding:0;">
-                    {% for asset_group in asset_groups %}
+                    {% for asset_group in all_asset_groups %}
                         <option value='{{ asset_group.id }}'>{{ asset_group.name }}</option>
                     {% endfor %}
                 </select>
