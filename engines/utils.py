@@ -6,7 +6,7 @@ from .models import EngineInstance
 from assets.models import Asset, AssetGroup
 from events.models import Event
 from events.utils import new_finding_alert, missing_finding_alert
-from findings.models import Finding, RawFinding
+from findings.models import Finding, RawFinding, FindingOverride
 from scans.models import ScanJob, Scan
 from common.utils import chunked_queryset
 from common.utils import net
@@ -584,7 +584,8 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                     f.status = "undone"
                 f.save()
                 new_raw_finding.status = f.status
-                new_raw_finding.save()
+                # new_raw_finding.save()
+                new_raw_finding.save(apply_overrides=True)
 
                 # Evaluate alerting rules
                 try:
@@ -596,9 +597,11 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 known_findings_list.append(new_raw_finding.hash)
             else:
                 new_raw_finding.status = tmp_status
-                new_raw_finding.save()
+                new_raw_finding.save(apply_overrides=True)
+
                 # Raise an alert
-                if tmp_status != "duplicate":
+                # if tmp_status != "duplicate":
+                if tmp_status == "new":
                     new_finding_alert(new_raw_finding.id, new_raw_finding.severity)
 
                 # Create an event if logging level OK
@@ -632,6 +635,7 @@ def _import_findings(findings, scan, engine_name=None, engine_id=None, owner_id=
                 for scope in scan_scopes:
                     new_finding.scopes.add(scope.id)
                 new_finding.save()
+                # new_finding.save(apply_overrides=True)
 
                 # Evaluate alerting rules
                 try:
@@ -815,7 +819,7 @@ def _create_asset_on_import(asset_value, scan, asset_type='unknown', parent=None
         # Caculate the risk grade
         asset_group.calc_risk_grade()
         asset_group.save()
-    
+
     if "new_assets_group" in scan.scan_definition.engine_policy.options.keys() and scan.scan_definition.engine_policy.options["new_assets_group"] not in ["", None]:
         asset_groupname = str(scan.scan_definition.engine_policy.options["new_assets_group"])
         Event.objects.create(message="{} Looking for a group named : {}".format(evt_prefix, asset_groupname), type="DEBUG", severity="INFO", scan=scan)
